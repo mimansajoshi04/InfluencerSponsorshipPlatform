@@ -1,0 +1,58 @@
+{% extends "auth/base.html" %}
+
+    {% block title %}Login Page{% endblock %}
+
+    {% block css%}
+        <link rel="stylesheet" href ="{{ url_for('static', filename = 'css/auth/login.css') }}">
+    {% endblock %}
+
+    {% block js%}
+        <script src="{{url_for('static', filename = 'js/auth/login.js')}}"></script>
+    {% endblock %}
+
+    {% block content %}
+
+    
+    <body>
+        <br>
+        <div>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{messages[0]}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="form-area">
+
+            <div class="form">
+
+                <h1>
+                    Login
+                </h1>
+                <form onsubmit="return login();" method="post">
+                    <input type="text" id="username" class="input" placeholder="username" name="username" required>
+                    <br><br>
+                    <input type="password" id ="password" class="input" placeholder="password" name="password" required>
+                    <br><br>
+                    <button type="submit" id="submit-button" class="login-button" onclick="login()">Login</button>
+                </form> 
+            </div>
+
+            <div class="img">
+                <button type="button" class="register-button" onclick="register()">Register</button>
+                <img src="/static/img/login.svg" height="500px" width="800px">
+    
+            </div>
+
+        </div>
+
+        
+
+    </body>
+    <br><br>
+
+    {% endblock %}

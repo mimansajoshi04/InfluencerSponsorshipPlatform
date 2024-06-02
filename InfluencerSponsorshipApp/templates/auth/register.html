@@ -1,0 +1,88 @@
+{% extends "auth/base.html" %}
+
+    {% block title %}Login Page{% endblock %}
+
+    {% block css%}
+        <link rel="stylesheet" href ="{{ url_for('static', filename = 'css/auth/register.css') }}">
+    {% endblock %}
+
+    {% block js%}
+        <script src="{{url_for('static', filename = 'js/auth/register.js')}}"></script>
+    {% endblock %}
+
+    {% block content %}
+    
+        <body>
+    
+            <br>
+            <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{messages[0]}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      
+                    {% endif %}
+                {% endwith %}
+            </div>
+    
+            <div class="form-area">
+    
+                <div class="form">
+    
+                    <h1>
+                        Register
+                    </h1>
+                    <form onsubmit="return register();" method="post">
+                    <input type="text" id="name" name = "name" class="input" placeholder="name" required>
+                    
+                    <br><br>
+    
+    
+                    <input type="text" name = "username" id="username" class="input" placeholder="username" required>
+                    <br><br>
+    
+                    <input type="email" name = "email" id="email" class="input" placeholder="xyz@gmail.com" required>
+                    <br><br>
+    
+                    <input type="password" name="password" id ="password" class="input" placeholder="password" required>
+                    <br><br>
+    
+                    <input type="password" id ="confirm-password" class="input" placeholder="confirm password" required>
+                        <br>
+                        <br>
+
+                      <div class="radiosss">
+                        <div class="form-check form-check-inline" style="margin-left: 10%;">
+                            <input class="form-check-input" type="radio" name="userType" id="influencer" value="influencer">
+                            <label class="form-check-label" for="influencer">Influencer</label>
+                          </div><br>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="userType" id="sponsor" value="sponsor">
+                            <label class="form-check-label" for="sponsor" >Sponsor</label>
+                          </div>
+                      </div>
+                    <br><br>
+                    
+    
+                    <button type="submit" id="submit-button" class="register-button">Register</button>
+                    <br><br>
+    
+                </form>
+                </div>
+    
+                <div class="img">
+                    <button type="button" class="login-button" onclick="login()">Login</button>
+                    <img src="/static/img/register.svg" height="500px" width="800px">
+        
+                </div>
+    
+            </div>
+    
+    
+        </body>
+        <br>
+        <br>
+
+    {% endblock %}
