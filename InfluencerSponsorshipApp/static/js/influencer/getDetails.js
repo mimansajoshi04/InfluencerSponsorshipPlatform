@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
         "Health and Wellness": ["Aerobics", "Gym", "Meditation","Yoga"],
         "Technology": ["Tech Expert"],
         "Travel": ["Vlogger", "Blogger"],
-        "Public Figure":["Public Figure"]
+        "Public Figure":["Public Figure","Politician"]
     };
 
     // Function to update the options of the dependent select
@@ -62,6 +62,10 @@ function finish(){
         return false;
     }
 
+    if(instaid.value ===""){
+        alert("As you have not provided instagram id, it is set to default as none. This can be changed any time from settings in Dashboard.")
+        instaid.value = "none";
+    }
     if(instaid.value.includes("@")){
         alert("Do not input the @ in instagram id!");
         return false;
