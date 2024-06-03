@@ -1,0 +1,132 @@
+{% extends "admin/base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/userManagement.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/admin/userManagement.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="searchby">
+    <form class="d-flex" role="search" id="formSearchBy" >
+        
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="filterbychoice">Filter By</label>
+                <select class="form-control" id="filterbychoice" name="filterbychoice">
+                  <option selected value="Choose...">Choose...</option>
+                  <option value="UserType">UserType</option>
+                  <option value="Active">Active</option>
+                </select>
+
+                <select class="form-control" id="filterbyvalue" name="filterbyvalue">
+                    <option selected value="Choose...">Choose...</option>
+
+                </select>
+            
+
+
+            <label class="input-group-text" for="filterbyvalue"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+        
+    </form>
+
+    
+    <form class="d-flex" role="search" id="formUsername">
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="usernameSearch">Filter By</label>
+            <input type="text" id="usernameSearch" name = "usernameSearch" class="form-control" placeholder="username">
+
+            <label class="input-group-text" for="usernameSearch"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+    </form>
+
+</div>
+
+<br><br>
+
+<div>
+
+    <div class="allUsers">
+        <br>
+        {% for i in range(0, users|length ,3) %}
+            
+            <div class="rows">
+                {% for j in range(i,i+3) %}
+                    {% if (users|length > j)  %}
+                    {% set user = users[i] %}
+                    <div class="users">
+                        <div class="card" style="width: 18rem;">
+                            <img src="..." class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title">{{users[j][1]}}</h5>
+                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item">An item</li>
+                              <li class="list-group-item">A second item</li>
+                              <li class="list-group-item">A third item</li>
+                            </ul>
+                            <div class="card-body">
+                              <a href="#" class="btn btn-primary">Link</a>
+                              <a href="#" class="btn btn-primary">Another link</a>
+                            </div>
+                          </div>
+                        </div>
+
+                    {% endif %}
+                    
+
+                {% endfor %}
+                <br><br>
+                
+            </div>
+            <br><br>
+            
+        {% endfor %}
+    </div>
+    
+
+
+</div>
+    
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="input-group mb-3">
+    <select class="form-select" id="inputGroupSelect02">
+      <option selected>Choose...</option>
+      <option value="1">One</option>
+      <option value="2">Two</option>
+      <option value="3">Three</option>
+    </select>
+    <label class="input-group-text" for="inputGroupSelect02"><button class="btn btn-success" type="submit">Search</button></label>
+</div>

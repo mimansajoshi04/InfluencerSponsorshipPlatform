@@ -10,13 +10,19 @@ class User(db.Model,UserMixin):
 
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(80),nullable=False,unique=True)
-    userType = db.Column(db.String(20),nullable=False,unique=True)
+    userType = db.Column(db.String(20),nullable=False)
+    email = db.Column(db.String(80),nullable=False,unique=True)
+    password = db.Column(db.String(200),nullable=False)
+    isActive = db.Column(db.Boolean,nullable=False)
 
 
-    def __init__(self,username,userType):
+    def __init__(self,username,userType,email,password):
         self.username = username
         self.userType = userType
-    
+        self.email = email
+        self.password = generate_password_hash(password)
+        self.isActive = False
+
 
 class Admin(db.Model,UserMixin):
     __table__name = 'admin'
@@ -24,8 +30,8 @@ class Admin(db.Model,UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(100), nullable = False)
     username = db.Column(db.String(80),db.ForeignKey('user.username'),nullable=False,unique=True)
-    email = db.Column(db.String(80),nullable=False,unique=True)
-    userType = db.Column(db.String(20),nullable=False,unique=True)
+    email = db.Column(db.String(80),db.ForeignKey('user.email'),nullable=False,unique=True)
+    userType = db.Column(db.String(20),db.ForeignKey('user.userType'),nullable=False)
     password = db.Column(db.String(200),nullable=False)
 
     def __init__(self,name,username,email,password,userType):
@@ -47,11 +53,13 @@ class Influencer(db.Model,UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(100), nullable = False)
     username = db.Column(db.String(80),db.ForeignKey('user.username'),nullable=False,unique=True)
-    email = db.Column(db.String(80),nullable=False,unique=True)
-    category = db.Column(db.String(80),nullable=False,unique=True)
-    niche = db.Column(db.String(80),nullable=False,unique=True)
+    email = db.Column(db.String(80),db.ForeignKey('user.email'),nullable=False,unique=True)
+    category = db.Column(db.String(80),nullable=False)
+    niche = db.Column(db.String(80),nullable=False)
+    followers = db.Column(db.String(80),nullable=False)
+    instaid = db.Column(db.String(80),nullable=False,unique=True)
     profilePicture = db.Column(db.String(100),nullable=False)
-    userType = db.Column(db.String(20),nullable=False,unique=True)
+    userType = db.Column(db.String(20),db.ForeignKey('user.userType'),nullable=False)
     password = db.Column(db.String(200),nullable=False)
 
     def __init__(self,name,username,email,password,userType,category,niche):
@@ -61,6 +69,8 @@ class Influencer(db.Model,UserMixin):
         self.email = email
         self.userType = userType
         self.category = category
+        self.followers = 0
+        self.instaid = ""
         self.niche = niche
         self.profilePicture = ""
         self.password = generate_password_hash(password)
@@ -76,11 +86,12 @@ class Sponsor(db.Model,UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     companyName = db.Column(db.String(100), nullable = False)
     username = db.Column(db.String(80),db.ForeignKey('user.username'),nullable=False,unique=True)
-    email = db.Column(db.String(80),nullable=False,unique=True)
+    email = db.Column(db.String(80),db.ForeignKey('user.email'),nullable=False,unique=True)
     budget = db.Column(db.Integer,nullable=False)
     profilePicture = db.Column(db.String(100),nullable=False)
-    userType = db.Column(db.String(20),nullable=False,unique=True)
+    userType = db.Column(db.String(20),db.ForeignKey('user.userType'),nullable=False)
     password = db.Column(db.String(200),nullable=False)
+    industry = db.Column(db.String(100), nullable = False)
 
     def __init__(self,name,username,email,password,userType,budget):
 
@@ -91,6 +102,9 @@ class Sponsor(db.Model,UserMixin):
         self.budget = budget
         self.profilePicture =""
         self.password = generate_password_hash(password)
+        self.industry = ""
+
+    
 
     
     def checkPassowrd(self,password):

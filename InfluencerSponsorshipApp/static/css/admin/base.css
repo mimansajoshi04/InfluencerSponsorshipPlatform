@@ -1,0 +1,20 @@
+footer {
+    height: max-content;
+    bottom: 0;
+    margin-left: 19%;
+    margin-right: 19%;
+}
+
+.navbar{
+    display: flex;
+    justify-content: space-between;
+
+    background-color: rgba(12, 40, 113, 1);
+    color: white;
+    padding: 13px;
+}
+
+body{
+    background-color: bisque;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}

@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard {% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/dashboard.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/admin/dashboard.js')}}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="operations">
+    <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/people-fill.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Users</h5>
+          <p class="card-text">Using this operation you can add, update, delete or flagg users.</p>
+          <br>
+          <a href="/admin/user_management" class="btn btn-primary">User Management</a><br><br>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/file-earmark.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Campaigns</h5>
+          <p class="card-text">Using this operation you can see all the campaigns currently going on and the completed campaigns.</p>
+          <a href="#" class="btn btn-primary">Check Campaigns</a><br><br>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/currency-rupee.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Ad Requests</h5>
+          <p class="card-text">Using this operation you can see all the advertisment requests from the sponsors and their status.</p>
+          <a href="#" class="btn btn-primary">Check Ad Requests</a><br><br>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/person-arms-up.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Active Users</h5>
+          <p class="card-text">Using this operation you can see all the active users and their relevant statistics.</p><br>
+          <a href="#" class="btn btn-primary">Check Active Users</a><br><br>
+        </div>
+      </div>
+
+
+
+{% endblock %}

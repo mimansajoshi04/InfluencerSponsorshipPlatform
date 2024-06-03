@@ -16,6 +16,9 @@ def load_user(user_id):
 
 
 from application.controllers.auth import *
+from application.controllers.sponsorController import *
+from application.controllers.influencerController import *
+from application.controllers.adminController import *
 
 
 

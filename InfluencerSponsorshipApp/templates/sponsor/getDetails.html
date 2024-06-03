@@ -1,0 +1,77 @@
+{% extends 'sponsor/base.html' %}
+
+{% block title %}Details Page{% endblock %}
+
+{% block css%}
+        <link rel="stylesheet" href ="{{ url_for('static', filename = 'css/sponsor/getDetails.css') }}">
+{% endblock %}
+
+{% block js%}
+        <script src="{{url_for('static', filename = 'js/sponsor/getDetails.js')}}"></script>
+{% endblock %}
+
+
+{% block content %}
+    
+        <body>
+    
+            <br>
+            <div>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        {{messages[0]}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <br>
+            <div class="progress" role="progressbar" aria-label="Info example" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-info text-dark" style="width: 80%; font-size: small; font-weight: bold;">You are almost done!</div>
+            </div>
+            <br><br>
+    
+            <div class="form-area">
+    
+                <div class="form">
+    
+                    <h1>
+                        Add Details
+                    </h1>
+                    <br>
+                    <form onsubmit="return finish();" method="post">
+                        
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="category">Category</label>
+                            <select class="form-select" id="industry" name="industry">
+                              <option selected>Choose...</option>
+                              
+                                {% for i in industry %}
+                                    <option value="{{i}}">{{i}}</option>
+                                {% endfor %}
+
+                            </select>
+                          </div>
+
+                        <br><br>
+
+                          <div class="input-group mb-3">
+                            <span class="input-group-text">$</span>
+                            <input type="number" name="budget" id="budget" class="form-control" style="color: blue;" placeholder="Amount (to the nearest dollar)">
+                            <span class="input-group-text">.00</span>
+                          </div>
+                          
+                          <button type="submit" class="btn btn-primary" >Finish</button>
+                    </form>
+                </div>
+    
+            </div>
+    
+    
+        </body>
+        <br>
+        <br>
+
+    {% endblock %}
