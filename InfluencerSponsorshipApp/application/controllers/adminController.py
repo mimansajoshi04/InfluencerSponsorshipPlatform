@@ -34,7 +34,7 @@ def adminDashboard():
 def userManagement():
 
     connection = db.engine.connect()
-    query = text("SELECT * FROM user")
+    query = text("SELECT * FROM user ORDER BY username")
     result = connection.execute(query)
     users = result.fetchall()
     
@@ -44,7 +44,7 @@ def userManagement():
             username = request.form["usernameSearch"]
             
             try:
-                query = text("SELECT * FROM user WHERE username = :username OR username LIKE :show ")
+                query = text("SELECT * FROM user WHERE username = :username OR username LIKE :show ORDER BY username")
                 result = connection.execute(query,{"username":username, "show": f"%{username}%"})
                 rows = result.fetchall()
                 if rows is None:
@@ -67,7 +67,7 @@ def userManagement():
                         filterbyvalue = 1
                     else:
                         filterbyvalue = 0
-                    query = text("SELECT * FROM user WHERE isActive = :filterbyvalue")
+                    query = text("SELECT * FROM user WHERE isActive = :filterbyvalue ORDER BY username")
                     details = {"filterbyvalue" :filterbyvalue }
                     result = connection.execute(query,details)
                     rows = result.fetchall()
@@ -81,7 +81,7 @@ def userManagement():
                         filterbyvalue = 0
                     else:
                         filterbyvalue = 1
-                    query = text("SELECT * FROM user WHERE isflagged = :filterbyvalue")
+                    query = text("SELECT * FROM user WHERE isflagged = :filterbyvalue ORDER BY username")
                     details = {"filterbyvalue" :filterbyvalue }
                     result = connection.execute(query,details)
                     rows = result.fetchall()
@@ -91,7 +91,7 @@ def userManagement():
                         return render_template("admin/userManagement.html",users=users,username=session["username"])
 
                 else:
-                    query = text("SELECT * FROM user WHERE userType = :filterbyvalue")
+                    query = text("SELECT * FROM user WHERE userType = :filterbyvalue ORDER BY username")
                     details = {"filterbyvalue" :filterbyvalue }
                     result = connection.execute(query,details)
                     rows = result.fetchall()
@@ -174,44 +174,18 @@ def addUser():
 
         try:
             userType = request.form["userType"]
+            
+            new = User(username,userType,email,password)
+            db.session.add(new)
+            db.session.commit()
+
+            flash("User added successfully! Click on User Management to see.")
+            return render_template("/admin/addUser.html",username=session["username"])
+        
         except KeyError:
+            
             flash("Select the user type: Admin OR Influencer OR Sponsor.")
-            return redirect(url_for('addUser'))
-            
-        userType = request.form["userType"]
-        session["userType"] = userType
+            return render_template("/admin/addUser.html",username=session["username"])
         
-        if userType == "influencer":
-            new = User(username,userType,email,password)
-            db.session.add(new)
-            db.session.commit()
-
-            flash("User added successfully! Click on User Management to see.")
-            return redirect(url_for('addUser'))
-            
-
-
-        elif userType == "sponsor":
-            new = User(username,userType,email,password)
-            db.session.add(new)
-            db.session.commit()
-
-            flash("User added successfully! Click on User Management to see.")
-            return redirect(url_for('addUser'))
-            
-
-
-        else:
-            new = User(username,userType,email,password)
-            db.session.add(new)
-            db.session.commit()
-
-            flash("User added successfully! Click on User Management to see.")
-            return redirect(url_for('addUser'))
-
         
-    return render_template("admin/addUser.html",username=session["username"])
-        
-
-
-    
+    return render_template("/admin/addUser.html",username=session["username"])
