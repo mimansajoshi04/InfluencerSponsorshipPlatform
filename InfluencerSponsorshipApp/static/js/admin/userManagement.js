@@ -3,8 +3,9 @@ document.addEventListener("DOMContentLoaded", function() {
     var filterbyvalue = document.getElementById("filterbyvalue");
 
     var optionsMap = {
-        "UserType" : ["admin","influencer","sponsor"],
-        "Active": ["active","inactive"]
+        "userType" : ["admin","influencer","sponsor"],
+        "isActive": ["active","inactive"],
+        "isflagged": ["flagged","not flagged"]
     };
 
     function updateDependentSelect() {
@@ -39,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var filterbychoice = document.getElementById("filterbychoice");
         var filterbyvalue = document.getElementById("filterbyvalue");
         console.log(filterbyvalue.value);
+        console.log(filterbychoice.value);
     
         if(filterbychoice.value==="Choose..."){
             alert("Choose an option to search by filter.");
@@ -73,3 +75,26 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+
+function reload(){
+    window.location.href = '/admin/user_management';
+}
+
+function flag_user(){
+    document.addEventListener("click",function(event){
+        btn = event.target.id;
+        window.location.href = '/admin/flag_user/' + btn;
+    });
+}
+
+function unflag_user(){
+    document.addEventListener("click",function(event){
+        btn = event.target.id;
+        window.location.href = '/admin/unflag_user/' + btn;
+    });
+}
+
+
+function addUser(){
+    window.location.href = "/admin/addUser";
+}

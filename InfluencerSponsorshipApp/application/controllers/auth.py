@@ -7,11 +7,30 @@ from flask_login import login_user,logout_user,login_required,LoginManager,curre
 
 from application.models.user import *
 
+@app.route("/dashboard")
+def dashboard():
+    
+    connection = db.engine.connect()
+    query= text("SELECT userType FROM user WHERE username = :username")
+    result = connection.execute(query,{'username':session["username"]})
+
+    row = result.fetchone()
+    if row[0] == "admin":
+        return redirect(url_for("adminDashboard"))
+    elif row[0] == "influencer":
+        return redirect(url_for("influencerDashboard"))
+    else:
+        return redirect(url_for("sponsorDashboard"))
+
 
 
 @app.route('/')
 def index():
-    return render_template("/auth/login.html")
+    if 'username' in session:
+        flash(f"Logged in as {session['username']}")
+        return redirect(url_for("dashboard"))
+    
+    return redirect(url_for('login'))
 
 
 @app.route('/login',methods=['GET','POST'])
@@ -43,18 +62,21 @@ def login():
             user = result.fetchall()
             userSession = User.query.filter_by(username=username).first()
 
+            with db.engine.begin() as connection:
+                query = text("UPDATE user SET isActive = 1 WHERE username = :username")
+                details = {"username" : username}
+                connection.execute(query,details)
+
             if user[0][2] == "admin":
                 login_user(userSession)
                 return redirect(url_for('adminDashboard'))
             
             elif user[0][2] == "influencer":
                 login_user(userSession)
-                connection.dispose()
                 return redirect(url_for('influencerDashboard'))
             
             else:
                 login_user(userSession)
-                connection.dispose()
                 return redirect(url_for('sponsorDashboard'))
         
         else:
@@ -163,6 +185,11 @@ def register():
 
 @app.route('/logout')
 def logout():
+    with db.engine.begin() as connection:
+        query = text("UPDATE user SET isActive = 0 WHERE username = :username")
+        details = {"username" : session["username"]}
+        connection.execute(query,details)
     logout_user()
+    session.pop('username', None)
     flash("Logged out. Log in again to continue.")
     return redirect(url_for('login'))

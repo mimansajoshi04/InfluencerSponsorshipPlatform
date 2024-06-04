@@ -32,3 +32,11 @@
     background-color: rgb(0, 132, 255);
     padding: 10px 20px;
 }
+
+.card{
+    transition: 10ms;
+}
+
+.card:hover{
+    transform: scale(1.02);
+}

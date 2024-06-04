@@ -31,6 +31,9 @@
               </div>
 
               <div class="buttons">
+
+                <a style="font-size: large;"></a>
+
                   <button class="btn btn-primary" onclick = "getToDashboard()">
                       Dashboard
                   </button>
@@ -43,16 +46,43 @@
                       Campaigns
                   </button>
 
-                  <button class="btn btn-primary">
-                      User reports
+                  <button class="btn btn-primary" onclick="user_management()">
+                      User Management
                   </button>
+
+                  <button class="btn btn-primary">
+                    User Activity
+                </button>
+
+                  <button class="btn btn-info" onclick="settings()">
+                    Settings
+                </button>
 
                   <button class="btn btn-info" onclick="logout()">
                       Logout
                   </button>
+
+                  <button class="btn btn-warning">
+                    {% block user %}{% endblock %}
+                    <img src="{{url_for('static',filename='img/person-circle.svg')}}" height="20px" width="20px"> 
+                </button>
               </div>
 
           </nav>
+
+          <br>
+
+          <div>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{messages[0]}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  
+                {% endif %}
+            {% endwith %}
+        </div>
       
           <br><br>
 

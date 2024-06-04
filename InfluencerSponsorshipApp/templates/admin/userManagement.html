@@ -10,20 +10,24 @@
     <script src="{{url_for('static',filename='js/admin/userManagement.js')}}"></script>
 {% endblock %}
 
+
+{%block user %}{{username}}{% endblock %}
+
 {% block content %}
 
 
 
 <div class="searchby">
-    <form class="d-flex" role="search" id="formSearchBy" >
+    <form class="d-flex" role="search" id="formSearchBy" method="post">
         
         <div class="input-group">
             <span class="input-group-text"></span>
             <label class="input-group-text" for="filterbychoice">Filter By</label>
                 <select class="form-control" id="filterbychoice" name="filterbychoice">
                   <option selected value="Choose...">Choose...</option>
-                  <option value="UserType">UserType</option>
-                  <option value="Active">Active</option>
+                  <option value="userType">UserType</option>
+                  <option value="isActive">Active</option>
+                  <option value="isflagged">Flagged</option>
                 </select>
 
                 <select class="form-control" id="filterbyvalue" name="filterbyvalue">
@@ -40,7 +44,7 @@
     </form>
 
     
-    <form class="d-flex" role="search" id="formUsername">
+    <form class="d-flex" role="search" id="formUsername" method="post">
         <div class="input-group">
             <span class="input-group-text"></span>
             <label class="input-group-text" for="usernameSearch">Filter By</label>
@@ -50,7 +54,14 @@
             
         </div>
     </form>
+    
+    <div style="padding: 10px;">
+        <button class="btn btn-warning" type="button" onclick="reload()">See all users</button>
+    </div>
 
+    <div style="padding: 10px;">
+        <button class="btn btn-warning" type="button" onclick="addUser()">Add user</button>
+    </div>
 </div>
 
 <br><br>
@@ -67,22 +78,40 @@
                     {% set user = users[i] %}
                     <div class="users">
                         <div class="card" style="width: 18rem;">
-                            <img src="..." class="card-img-top" alt="...">
+
+                            {% if users[j][5] == 1%}
+                                <span class="badge text-bg-success">Active</span>
+                            {% else %}
+                            <span class="badge text-bg-secondary">Inactive</span>
+                            {% endif %}
+
+                            {% if users[j][2]=="admin" %}
+                                <img src="{{url_for('static',filename='img/person-gear.svg')}}" class="card-img-top" alt="..." width="100px" height="100px">
+                            {% else %}
+                                <img src="..." class="card-img-top" alt="...">
+                            {% endif %}
                             <div class="card-body">
-                              <h5 class="card-title">{{users[j][1]}}</h5>
+                              <h5 class="card-title"><b>{{users[j][1]}}</b></h5>
                               <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                             </div>
                             <ul class="list-group list-group-flush">
-                              <li class="list-group-item">An item</li>
-                              <li class="list-group-item">A second item</li>
-                              <li class="list-group-item">A third item</li>
+                              <li class="list-group-item"><b>Role: {{users[j][2]}} </b></li>
+                              <li class="list-group-item">Email: {{users[j][3]}}</li>
                             </ul>
                             <div class="card-body">
-                              <a href="#" class="btn btn-primary">Link</a>
-                              <a href="#" class="btn btn-primary">Another link</a>
+                                {% if users[j][6] ==0 %}
+                                    <button  class="btn btn-primary" onclick="flag_user()" id="{{users[j][1]}}">Flag User</button>
+                                {% else %}
+                                    <button  class="btn btn-warning" onclick="unflag_user()" id="{{users[j][1]}}">Unflag User</button>
+                                {% endif %}
+                              <button  class="btn btn-primary" onclick="see_details()">See Details</button>
                             </div>
-                          </div>
+
+                            
+                            
+                            
                         </div>
+                    </div>
 
                     {% endif %}
                     
@@ -106,27 +135,3 @@
 
 
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="input-group mb-3">
-    <select class="form-select" id="inputGroupSelect02">
-      <option selected>Choose...</option>
-      <option value="1">One</option>
-      <option value="2">Two</option>
-      <option value="3">Three</option>
-    </select>
-    <label class="input-group-text" for="inputGroupSelect02"><button class="btn btn-success" type="submit">Search</button></label>
-</div>
