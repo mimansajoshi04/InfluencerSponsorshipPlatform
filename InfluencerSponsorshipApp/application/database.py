@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from sqlalchemy import create_engine
-
+from flask_cors import CORS
 
 
 
@@ -14,3 +14,4 @@ app.config['SQLALCHEMY_POOL_SIZE'] = 20
 engine = create_engine('sqlite:///testdb.db')
 
 db = SQLAlchemy(app)    
+CORS(app)

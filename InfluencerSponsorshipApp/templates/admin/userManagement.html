@@ -18,7 +18,7 @@
 
 
 <div class="searchby">
-    <form class="d-flex" role="search" id="formSearchBy" method="post">
+    <form class="d-flex" role="search" id="formSearchBy" method="post" onsubmit="return true">
         
         <div class="input-group">
             <span class="input-group-text"></span>
@@ -44,7 +44,7 @@
     </form>
 
     
-    <form class="d-flex" role="search" id="formUsername" method="post">
+    <form class="d-flex" role="search" id="formUsername" method="post" onsubmit="return true">
         <div class="input-group">
             <span class="input-group-text"></span>
             <label class="input-group-text" for="usernameSearch">Filter By</label>
@@ -70,6 +70,7 @@
 
     <div class="allUsers">
         <br>
+
         {% for i in range(0, users|length ,3) %}
             
             <div class="rows">
@@ -100,11 +101,11 @@
                             </ul>
                             <div class="card-body">
                                 {% if users[j][6] ==0 %}
-                                    <button  class="btn btn-primary" onclick="flag_user()" id="{{users[j][1]}}">Flag User</button>
+                                    <button type="button" class="btn btn-primary" onclick="flag_user()" id="{{users[j][1]}}">Flag User</button>
                                 {% else %}
-                                    <button  class="btn btn-warning" onclick="unflag_user()" id="{{users[j][1]}}">Unflag User</button>
+                                    <button type="button"  class="btn btn-warning" onclick="unflag_user()" id="{{users[j][1]}}">Unflag User</button>
                                 {% endif %}
-                              <button  class="btn btn-primary" onclick="see_details()">See Details</button>
+                              <button type="button" class="btn btn-primary" onclick="see_details()">See Details</button>
                             </div>
 
                             

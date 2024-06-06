@@ -1,5 +1,5 @@
 from application.database import db,app
-from flask import render_template,request,session,flash,redirect,url_for
+from flask import render_template,request,session,flash,redirect,url_for,jsonify
 from sqlalchemy import text
 from werkzeug.security import check_password_hash
 from flask_login import login_user,logout_user,login_required,LoginManager,current_user
@@ -37,6 +37,8 @@ def userManagement():
     query = text("SELECT * FROM user ORDER BY username")
     result = connection.execute(query)
     users = result.fetchall()
+
+    
     
 
     if request.method =="POST":
@@ -49,12 +51,12 @@ def userManagement():
                 rows = result.fetchall()
                 if rows is None:
                     flash("No user found. Please check again.")
-                    return render_template("admin/userManagement.html",users=users,username=session["username"])
-                return render_template("admin/userManagement.html",users=rows,username=session["username"])
+                    return render_template("admin/userManagement.html",users=users,username=session["username"],method="GET")
+                return render_template("admin/userManagement.html",users=rows,username=session["username"],method="GET")
 
             except Exception as e:
                 flash(f"Error occurred: {e}")
-                return render_template("admin/userManagement.html",users=users,username=session["username"])
+                return render_template("admin/userManagement.html",users=users,username=session["username"],method="GET")
 
 
         except KeyError:
@@ -74,7 +76,9 @@ def userManagement():
                 
                     if rows is None:
                         flash("No user found. Please check again.")
-                        return render_template("admin/userManagement.html",users=users,username=session["username"])
+                        return render_template("admin/userManagement.html",users=users,username=session["username"],method="GET")
+                    
+                    return render_template("admin/userManagement.html",users=rows,username=session["username"],method="GET")
                     
                 elif filterbychoice =="isflagged":
                     if filterbyvalue == "not flagged":
@@ -88,7 +92,9 @@ def userManagement():
                 
                     if rows is None:
                         flash("No user found. Please check again.")
-                        return render_template("admin/userManagement.html",users=users,username=session["username"])
+                        return render_template("admin/userManagement.html",users=users,username=session["username"],method="GET")
+                    
+                    return render_template("admin/userManagement.html",users=rows,username=session["username"],method="GET")
 
                 else:
                     query = text("SELECT * FROM user WHERE userType = :filterbyvalue ORDER BY username")
@@ -98,18 +104,17 @@ def userManagement():
                 
                     if rows is None:
                         flash("No user found. Please check again.")
-                        return render_template("admin/userManagement.html",users=users,username=session["username"])
+                        return render_template("admin/userManagement.html",users=users,username=session["username"],method="GET")
                     
-                
-                return render_template("admin/userManagement.html",users=rows,username=session["username"])
+                    return render_template("admin/userManagement.html",users=rows,username=session["username"],method="GET")
 
             except Exception as e:
                 flash(f"Error occurred: {e}")
-                return render_template("admin/userManagement.html",users=users,username=session["username"])
+                return render_template("admin/userManagement.html",users=users,username=session["username"],method="GET")
     
 
     if request.method == "GET":
-        return render_template("admin/userManagement.html",users=users,username=session["username"])
+        return render_template("admin/userManagement.html",users=users,username = session["username"])
     
 
 @app.route("/admin/flag_user/<username>",methods=["GET"])

@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         else{
             formSearchBy.submit();
-            window.location.href = '/admin/user_management';
+            window.onload = '/admin/user_management';
         }
     });
 
@@ -70,14 +70,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         else{
             formUsername.submit();
-            window.location.href = '/admin/user_management';
+            window.onload = '/admin/user_management';
         }
     });
 });
 
 
 function reload(){
-    window.location.href = '/admin/user_management';
+    window.location.href = "/admin/user_management";
 }
 
 function flag_user(){
