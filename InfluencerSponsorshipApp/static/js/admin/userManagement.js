@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return false;
         }
 
+        
         else{
             formSearchBy.submit();
             window.onload = '/admin/user_management';
@@ -97,4 +98,20 @@ function unflag_user(){
 
 function addUser(){
     window.location.href = "/admin/addUser";
+}
+
+function see_details(){
+    document.addEventListener("click",function(event){
+        btn = event.target.id;
+        window.location.href = "/admin/see_user_details/" + btn;
+    });
+    
+}
+
+function delete_user(){
+    document.addEventListener("click",function(event){
+        btn = event.target.id;
+        window.location.href = "/admin/delete_user/" + btn;
+    });
+    
 }

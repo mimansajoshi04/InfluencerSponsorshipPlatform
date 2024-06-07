@@ -4,7 +4,7 @@ from sqlalchemy import text
 from werkzeug.security import check_password_hash
 from flask_login import login_user,logout_user,login_required,LoginManager,current_user
 
-from application.models.user import User
+from application.models.user import *
 
 
 @app.route("/admin/dashboard",methods=["GET","POST"])
@@ -149,17 +149,12 @@ def unflagUser(username):
 def addUser():
     
     if request.method == "POST":
+
         username = request.form["username"]
         password = request.form["password"]
         name = request.form["name"]
         email = request.form["email"]
-
-
-        session["username"] = username
-        session["name"] = name
-        session["email"] = email
-        session["password"] = password
-
+        
         connection = db.engine.connect()
         query = text("SELECT username FROM user WHERE username = :username")
         result = connection.execute(query,{"username": username})
@@ -184,6 +179,23 @@ def addUser():
             db.session.add(new)
             db.session.commit()
 
+            if userType == "admin":
+                new = Admin(name,username,email,password,userType)
+                db.session.add(new)
+                db.session.commit()
+
+            elif userType == "influencer":
+                new = Influencer(name,username,email,password,userType,"","")
+                db.session.add(new)
+                db.session.commit()
+
+            else:
+                new = Sponsor(name,username,email,password,userType,0)
+                db.session.add(new)
+                db.session.commit()
+
+
+
             flash("User added successfully! Click on User Management to see.")
             return render_template("/admin/addUser.html",username=session["username"])
         
@@ -194,3 +206,188 @@ def addUser():
         
         
     return render_template("/admin/addUser.html",username=session["username"])
+
+
+@app.route("/admin/settings",methods=["GET","POST"])
+def adminSettings():
+
+
+
+    with db.engine.begin() as connection:
+        query = text("SELECT admin.name,user.username,user.email FROM user JOIN admin ON user.username = admin.username WHERE user.username = :username")
+        details = {"username": session["username"]}
+
+        results = connection.execute(query,details)
+
+        userDetails = results.fetchall()
+
+        if userDetails is None:
+            flash("No user found!")
+            return render_template("/admin/settings.html",username=session["username"])
+        
+
+    if request.method == "POST":
+
+        name = request.form["name"]
+        username = request.form["username"]
+        email = request.form["email"]
+
+
+        with db.engine.begin() as connection:
+
+            orignalUN = session["username"]
+            
+            if username != orignalUN:
+                query = text("SELECT username FROM user WHERE username = :username")
+                details = {"username":username}
+
+                results = connection.execute(query,details)
+            
+
+                if results.fetchall() != []:
+                    flash("Username already exists. Try another username.")
+                    return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],method="GET")
+            
+            query = text("SELECT email FROM user WHERE username = :user")
+            details = {"user":session["username"]}
+
+            results = connection.execute(query,details)
+
+            orignalEM = results.fetchall()[0][0]
+
+            if email!= orignalEM:
+            
+                query = text("SELECT email FROM user WHERE email = :email")
+                details = {"email":email}
+
+                results = connection.execute(query,details)
+
+            
+
+                if results.fetchall() != []:
+                    flash("Email already exists. Try another email.")
+                    return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],method="GET")
+
+
+            query = text("UPDATE user SET username = :username, email = :email WHERE username = :user")
+            details = {"username":username,"email":email,"user" :session["username"]}
+
+            connection.execute(query,details)
+
+            query = text("UPDATE admin SET username = :username, email = :email, name = :name WHERE username = :user")
+            details = {"name":name,"username":username,"email":email,"user" :session["username"]}
+
+            connection.execute(query,details)
+
+            flash("User details edited!")
+
+            query = text("SELECT admin.name,user.username,user.email FROM user JOIN admin ON user.username = admin.username WHERE user.username = :username")
+            details = {"username": username}
+
+            results = connection.execute(query,details)
+
+            userDetails = results.fetchall()
+
+            session["username"] = username
+
+
+            return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],method="GET")
+    
+
+    return render_template("admin/settings.html",userDetails = userDetails[0],username = session["username"])
+
+
+@app.route("/admin/see_user_details/<username>")
+def see_user_details(username):
+
+
+    with db.engine.connect() as connection:
+        query = text("SELECT userType FROM user WHERE username = :username")
+        details = {"username": username}
+
+        results = connection.execute(query,details)
+
+        row = results.fetchone()
+        
+        if row[0] == "admin":
+
+            query = text("SELECT * FROM admin WHERE username = :username")
+            details = {"username": username}
+            results = connection.execute(query,details)
+            userDetails = results.fetchone()
+            return f"{userDetails}"
+
+
+            return "admin"
+        
+        if row[0] == "influencer":
+
+            query = text("SELECT * FROM influencer WHERE username = :username")
+            details = {"username": username}
+            results = connection.execute(query,details)
+            userDetails = results.fetchone()
+            return f"{userDetails}"
+
+            return "influencer"
+        
+        if row[0] == "sponsor":
+
+            query = text("SELECT * FROM sponsor WHERE username = :username")
+            details = {"username": username}
+            results = connection.execute(query,details)
+            userDetails = results.fetchone()
+            
+            return f"{userDetails}"
+            return "sponsor"
+
+    return render_template("admin/user_details.html")
+
+@app.route("/admin/delete_user/<username>")
+def deleteUser(username):
+    
+    if username != session["username"]:
+        with db.engine.connect() as connection:
+            query = text("SELECT isActive FROM user WHERE username = :username")
+            details = {"username": username}
+
+            results = connection.execute(query,details)
+            row = results.fetchone()
+
+            
+            if row[0] == 1:
+                flash("You cannot delete user when the user is active.")
+                return redirect(url_for("userManagement"))
+            
+            else:
+                query = text("SELECT userType FROM user WHERE username= :username")
+                details = {"username": username}
+
+                results = connection.execute(query,details)
+
+                userType = results.fetchone()[0]
+
+                user = User.query.filter_by(username=username).first()
+                db.session.delete(user)
+                db.session.commit()
+                
+
+                if userType == "admin":
+                    user = Admin.query.filter_by(username=username).first()
+                    db.session.delete(user)
+                    db.session.commit()
+                elif userType=="influencer":
+                    user = Influencer.query.filter_by(username=username).first()
+                    db.session.delete(user)
+                    db.session.commit()
+                else:
+                    user = Sponsor.query.filter_by(username=username).first()
+                    db.session.delete(user)
+                    db.session.commit()
+
+            flash("User deleted successfully!")
+            return redirect(url_for("userManagement"))
+
+    else:
+        flash("You cannot delete the user as you are logged in! Please check settings to delete account.")
+        return redirect(url_for("userManagement"))
+        

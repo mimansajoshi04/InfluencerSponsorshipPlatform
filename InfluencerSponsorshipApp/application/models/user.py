@@ -31,9 +31,9 @@ class Admin(db.Model,UserMixin):
 
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(100), nullable = False)
-    username = db.Column(db.String(80),db.ForeignKey('user.username'),nullable=False,unique=True)
-    email = db.Column(db.String(80),db.ForeignKey('user.email'),nullable=False,unique=True)
-    userType = db.Column(db.String(20),db.ForeignKey('user.userType'),nullable=False)
+    username = db.Column(db.String(80),nullable=False,unique=True)
+    email = db.Column(db.String(80),nullable=False,unique=True)
+    userType = db.Column(db.String(20),nullable=False)
     password = db.Column(db.String(200),nullable=False)
 
     def __init__(self,name,username,email,password,userType):
@@ -54,14 +54,14 @@ class Influencer(db.Model,UserMixin):
 
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(100), nullable = False)
-    username = db.Column(db.String(80),db.ForeignKey('user.username'),nullable=False,unique=True)
-    email = db.Column(db.String(80),db.ForeignKey('user.email'),nullable=False,unique=True)
+    username = db.Column(db.String(80),nullable=False,unique=True)
+    email = db.Column(db.String(80),nullable=False,unique=True)
     category = db.Column(db.String(80),nullable=False)
     niche = db.Column(db.String(80),nullable=False)
     followers = db.Column(db.String(80),nullable=False)
-    instaid = db.Column(db.String(80),nullable=False,unique=True)
+    instaid = db.Column(db.String(80),nullable=False)
     profilePicture = db.Column(db.String(100),nullable=False)
-    userType = db.Column(db.String(20),db.ForeignKey('user.userType'),nullable=False)
+    userType = db.Column(db.String(20),nullable=False)
     password = db.Column(db.String(200),nullable=False)
 
     def __init__(self,name,username,email,password,userType,category,niche):
@@ -87,11 +87,11 @@ class Sponsor(db.Model,UserMixin):
 
     id = db.Column(db.Integer, primary_key = True)
     companyName = db.Column(db.String(100), nullable = False)
-    username = db.Column(db.String(80),db.ForeignKey('user.username'),nullable=False,unique=True)
-    email = db.Column(db.String(80),db.ForeignKey('user.email'),nullable=False,unique=True)
+    username = db.Column(db.String(80),nullable=False,unique=True)
+    email = db.Column(db.String(80),nullable=False,unique=True)
     budget = db.Column(db.Integer,nullable=False)
     profilePicture = db.Column(db.String(100),nullable=False)
-    userType = db.Column(db.String(20),db.ForeignKey('user.userType'),nullable=False)
+    userType = db.Column(db.String(20),nullable=False)
     password = db.Column(db.String(200),nullable=False)
     industry = db.Column(db.String(100), nullable = False)
 

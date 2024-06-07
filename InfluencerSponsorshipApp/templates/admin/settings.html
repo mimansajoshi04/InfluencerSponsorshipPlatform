@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/settings.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/admin/settings.js')}}"></script>
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div>
+
+
+    <div class="form-area">
+    
+        <div class="form">
+
+            <h1>
+                Edit details
+            </h1>
+            <br>
+            <form onsubmit="return edit();" method="post">
+
+                  <br>
+                <label for="name">Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="name" value="{{userDetails[0]}}" required>
+                <br><br>
+                
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="username" value="{{userDetails[1]}}" required>
+                <br><br>
+
+                <label for="email">Email</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="xyz@gmail.com" value="{{userDetails[2]}}"  required>
+                <br><br>
+
+              
+                </div>
+                <br>
+
+                <button type="submit" class="btn btn-primary" onclick="edit()">Edit</button>
+
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -93,7 +93,7 @@
                             {% endif %}
                             <div class="card-body">
                               <h5 class="card-title"><b>{{users[j][1]}}</b></h5>
-                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                              <p class="card-text">Click on see details to check all the details for the user.</p>
                             </div>
                             <ul class="list-group list-group-flush">
                               <li class="list-group-item"><b>Role: {{users[j][2]}} </b></li>
@@ -105,11 +105,12 @@
                                 {% else %}
                                     <button type="button"  class="btn btn-warning" onclick="unflag_user()" id="{{users[j][1]}}">Unflag User</button>
                                 {% endif %}
-                              <button type="button" class="btn btn-primary" onclick="see_details()">See Details</button>
+                              <button type="button" class="btn btn-primary" id="{{users[j][1]}}" onclick="see_details()">See Details</button>
+                            <br><br>
+                              <button type="button" class="btn btn-danger" id="{{users[j][1]}}"  onclick="delete_user()">Delete User</button>
+  
                             </div>
 
-                            
-                            
                             
                         </div>
                     </div>
