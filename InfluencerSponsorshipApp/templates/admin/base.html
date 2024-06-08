@@ -20,6 +20,8 @@
 
     </head>
 
+    
+
     <body>
 
       <div>
@@ -50,9 +52,14 @@
                       User Management
                   </button>
 
-                  <button class="btn btn-primary">
-                    User Activity
-                </button>
+                  <button type="button" class="btn btn-primary position-relative">
+                    Messages
+                    {% if new==1 %}
+                    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                      <span class="visually-hidden">New alerts</span>
+                    </span>
+                    {% endif %}
+                  </button>
 
                   <button class="btn btn-info" onclick="settings()">
                     Settings
@@ -69,6 +76,22 @@
               </div>
 
           </nav>
+
+          {% if new ==1 %}
+
+    <div class="toast-container"id ="toast">
+
+        <div class="toast-header">
+          <strong class="me-auto">Notification</strong>
+          <small>now</small>
+        </div>
+        <div class="toast-body">
+          New messages while you were gone!
+          
+        </div>
+
+    </div>
+    {% endif %}
 
           <br>
 

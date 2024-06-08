@@ -13,3 +13,15 @@ function user_management(){
 function settings(){
     window.location.href = '/admin/settings';
 }
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const toast = document.getElementById("toast");
+
+    toast.classList.add("show");
+
+    setTimeout(function() {
+        toast.classList.remove("show");
+    }, 3000); 
+});

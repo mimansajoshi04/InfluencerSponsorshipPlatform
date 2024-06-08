@@ -13,7 +13,7 @@ def adminDashboard():
     username = session["username"]
 
     with db.engine.begin() as connection:
-        query = text("SELECT userType FROM user WHERE username = :username")
+        query = text("SELECT userType,newMessages FROM user WHERE username = :username")
         result = connection.execute(query,{"username":username})
         row = result.fetchone()
         if row[0] == "sponsor":
@@ -23,10 +23,9 @@ def adminDashboard():
         else:
             pass
 
-    if request.method == "POST":
-        return "bye"
+        
     
-    return render_template("admin/dashboard.html",username=username)
+    return render_template("admin/dashboard.html",username=username,new=row[1])
     
 
 @app.route("/admin/user_management",methods=["GET","POST"])
@@ -114,10 +113,17 @@ def userManagement():
     
 
     if request.method == "GET":
-        return render_template("admin/userManagement.html",users=users,username = session["username"])
+        with db.engine.begin() as connection:
+            query = text("SELECT newMessages FROM user WHERE username = :user")
+            details = {"user":session["username"]}
+            results = connection.execute(query,details)
+            row = results.fetchone()
+
+            return render_template("admin/userManagement.html",users=users,username = session["username"],new=row[0])
     
 
 @app.route("/admin/flag_user/<username>",methods=["GET"])
+@login_required
 def flagUser(username):
     query = text("UPDATE user SET isflagged = 1 WHERE username = :username")
     details = {"username":username}
@@ -133,6 +139,7 @@ def flagUser(username):
 
 
 @app.route("/admin/unflag_user/<username>")
+@login_required
 def unflagUser(username):
     query = text("UPDATE user SET isflagged = 0 WHERE username = :username")
     details = {"username":username}
@@ -146,6 +153,7 @@ def unflagUser(username):
 
 
 @app.route("/admin/addUser",methods = ["GET","POST"])
+@login_required
 def addUser():
     
     if request.method == "POST":
@@ -161,7 +169,7 @@ def addUser():
 
         if result.fetchone() is not None:
             flash("Username already exists.")
-            return render_template("/admin/addUser.html",username=session["username"])
+            return redirect(url_for("addUser"))
         
         connection = db.engine.connect()
         query = text("SELECT email FROM user WHERE email = :email")
@@ -169,7 +177,7 @@ def addUser():
 
         if result.fetchone() is not None:
             flash("Email id already exists.")
-            return render_template("/admin/addUser.html",username=session["username"])
+            return redirect(url_for("addUser"))
             
 
         try:
@@ -197,18 +205,24 @@ def addUser():
 
 
             flash("User added successfully! Click on User Management to see.")
-            return render_template("/admin/addUser.html",username=session["username"])
+            return redirect(url_for("addUser"))
         
         except KeyError:
             
             flash("Select the user type: Admin OR Influencer OR Sponsor.")
-            return render_template("/admin/addUser.html",username=session["username"])
+            return redirect(url_for("addUser"))
         
+    with db.engine.begin() as connection:
+        query = text("SELECT newMessages FROM user WHERE username = :user")
+        details = {"user":session["username"]}
+        results = connection.execute(query,details)
+        row = results.fetchone()
         
-    return render_template("/admin/addUser.html",username=session["username"])
+        return render_template("/admin/addUser.html",username=session["username"],new=row[0])
 
 
 @app.route("/admin/settings",methods=["GET","POST"])
+@login_required
 def adminSettings():
 
 
@@ -221,9 +235,14 @@ def adminSettings():
 
         userDetails = results.fetchall()
 
+        query = text("SELECT newMessages FROM user WHERE username = :user")
+        details = {"user":session["username"]}
+        results = connection.execute(query,details)
+        row = results.fetchone()
+
         if userDetails is None:
             flash("No user found!")
-            return render_template("/admin/settings.html",username=session["username"])
+            return redirect(url_for("addUser"))
         
 
     if request.method == "POST":
@@ -246,7 +265,7 @@ def adminSettings():
 
                 if results.fetchall() != []:
                     flash("Username already exists. Try another username.")
-                    return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],method="GET")
+                    return redirect(url_for("adminSettings"))
             
             query = text("SELECT email FROM user WHERE username = :user")
             details = {"user":session["username"]}
@@ -266,7 +285,7 @@ def adminSettings():
 
                 if results.fetchall() != []:
                     flash("Email already exists. Try another email.")
-                    return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],method="GET")
+                    return redirect(url_for("adminSettings"))
 
 
             query = text("UPDATE user SET username = :username, email = :email WHERE username = :user")
@@ -290,19 +309,25 @@ def adminSettings():
 
             session["username"] = username
 
+            query = text("SELECT newMessages FROM user WHERE username = :user")
+            details = {"user":session["username"]}
+            results = connection.execute(query,details)
+            row = results.fetchone()
 
-            return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],method="GET")
+
+            return render_template("/admin/settings.html",username=session["username"],userDetails = userDetails[0],new = row[0],method="GET")
     
 
-    return render_template("admin/settings.html",userDetails = userDetails[0],username = session["username"])
+    return render_template("admin/settings.html",userDetails = userDetails[0],new = row[0],username = session["username"])
 
 
 @app.route("/admin/see_user_details/<username>")
+@login_required
 def see_user_details(username):
 
 
     with db.engine.connect() as connection:
-        query = text("SELECT userType FROM user WHERE username = :username")
+        query = text("SELECT userType,newMessages FROM user WHERE username = :username")
         details = {"username": username}
 
         results = connection.execute(query,details)
@@ -316,7 +341,7 @@ def see_user_details(username):
             results = connection.execute(query,details)
             userDetails = results.fetchone()
             
-            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],userType="admin")
+            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],new=row[1],userType="admin")
         
         if row[0] == "influencer":
 
@@ -325,7 +350,7 @@ def see_user_details(username):
             results = connection.execute(query,details)
             userDetails = results.fetchone()
             
-            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],userType="influencer")
+            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],new=row[1],userType="influencer")
         
         if row[0] == "sponsor":
 
@@ -334,11 +359,12 @@ def see_user_details(username):
             results = connection.execute(query,details)
             userDetails = results.fetchone()
             
-            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],userType="sponsor")
+            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],new=row[1],userType="sponsor")
 
     return render_template("admin/user_details.html")
 
 @app.route("/admin/delete_user/<username>")
+@login_required
 def deleteUser(username):
 
     
@@ -390,10 +416,8 @@ def deleteUser(username):
         
 
 @app.route("/admin/delete_account")
-def deleteAccount():
-
-
-    
+@login_required
+def deleteAdminAccount():
 
     with db.engine.begin() as connection:
         query = text("SELECT count(*) FROM user WHERE userType = 'admin'")

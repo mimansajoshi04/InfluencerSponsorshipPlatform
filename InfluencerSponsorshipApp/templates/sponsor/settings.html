@@ -1,0 +1,101 @@
+{% extends "sponsor/base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/sponsor/settings.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/sponsor/settings.js')}}"></script>
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div>
+
+
+    <div class="form-area">
+    
+        <div class="form">
+
+            <h1>
+                Edit details
+            </h1>
+            <br>
+            <form onsubmit="return edit();" method="post">
+
+                  <br>
+                <label for="name">Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="name" value="{{userDetails[0]}}" required>
+                <br><br>
+                
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="username" value="{{userDetails[1]}}" required>
+                <br><br>
+
+                <label for="email">Email</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="xyz@gmail.com" value="{{userDetails[2]}}"  required>
+                <br><br>
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="category">Category</label>
+                    <select class="form-select" id="industry" name="industry">
+                      <option selected value="{{userDetails[3]}}">{{userDetails[3]}}</option>
+                      
+                        {% for i in industry %}
+                            <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+
+                    </select>
+                  </div>
+
+                <br><br>
+
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">$</span>
+                    <input type="number" name="budget" id="budget" value="{{userDetails[4]}}" class="form-control" style="color: blue;" placeholder="Amount (to the nearest dollar)">
+                    <span class="input-group-text">.00</span>
+                  </div>
+
+              
+                </div>
+                <br>
+
+                <button type="submit" class="btn btn-primary" onclick="edit()">Edit</button>
+
+
+            </form>
+        </div>
+
+    </div>
+
+    <br>
+    <br>
+    <center>
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Delete account?
+  </button>
+  
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to delete your account?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    </center>
+</div>
+
+{% endblock %}

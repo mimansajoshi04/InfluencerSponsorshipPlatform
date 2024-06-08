@@ -15,6 +15,7 @@ class User(db.Model,UserMixin):
     password = db.Column(db.String(200),nullable=False)
     isActive = db.Column(db.Boolean,nullable=False)
     isflagged = db.Column(db.Boolean,nullable=False)
+    newMessages = db.Column(db.Boolean,nullable=False)
 
 
     def __init__(self,username,userType,email,password):
@@ -24,6 +25,7 @@ class User(db.Model,UserMixin):
         self.password = generate_password_hash(password)
         self.isActive = False
         self.isflagged = False
+        self.newMessages = False
 
 
 class Admin(db.Model,UserMixin):

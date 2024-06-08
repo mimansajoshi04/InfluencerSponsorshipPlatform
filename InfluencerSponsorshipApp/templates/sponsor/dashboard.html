@@ -1,0 +1,56 @@
+{% extends 'sponsor/base.html' %}
+
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block user %}
+    {{username}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/sponsor/dashboard.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/sponsor/dashboard.js')}}"></script>
+{% endblock %}
+
+
+{% block content %}
+
+
+
+<div class="operations">
+    <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/people-fill.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Ad requests</h5>
+          <p class="card-text">Using this operation you can see all the ad requests with their current status.</p>
+          <a href="/sponsor/my_adRequests" class="btn btn-primary">My Ad Requests</a><br><br>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/file-earmark.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Campaigns</h5>
+          <p class="card-text">Using this operation you can see all the campaigns currently going on and the completed campaigns.</p>
+          <a href="/sponsor/my_campaigns" class="btn btn-primary">My Campaigns</a><br><br>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/currency-rupee.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Find influencers</h5>
+          <p class="card-text">Using this operation you can find all the influencers and send them ad requests for campaigns.</p>
+          <a href="/sponsor/find_influencers" class="btn btn-primary">Find Influencers</a><br><br>
+        </div>
+      </div>
+
+
+
+
+{% endblock %}
