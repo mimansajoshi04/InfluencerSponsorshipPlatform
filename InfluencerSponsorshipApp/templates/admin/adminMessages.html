@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Messages {% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/message.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/admin/message.js')}}"></script>
+{% endblock %}
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div class="messages">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">All</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Unread</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Read</button>
+        </li>
+        
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        {% for row in all %}
+
+        
+            <div class="container mt-5">
+                <div class="message-list">
+                    <div class="message-item">
+
+                        <p><strong>{{row[2]}}</strong>:  {{row[1]}}</p>
+                        <p><small>Message: {{row[4]}}</small></p>
+                        <p><small>Received: {{row[6]}}</small></p>
+                        {% if row[5] == 0 %}
+                            <button class="btn btn-warning" id="{{row[0]}}" type="button" onclick="mark_as_read()">Mark as read</button>
+                        {% else %}    
+                            <button class="btn btn-info" id="{{row[0]}}" type="button" onclick="mark_as_unread()">Mark as unread</button>
+                            <button class="btn btn-secondary" id="{{row[0]}}" type="button" onclick="reply()">Reply</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+        
+            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="1">
+                {% for row in unread %}
+                <div class="container mt-5">
+                    <div class="message-list">
+                        <div class="message-item">
+    
+                            <p><strong>{{row[2]}}</strong>:  {{row[1]}}</p>
+                            <p><small>Message: {{row[4]}}</small></p>
+                            <p><small>Received: {{row[6]}}</small></p>
+                            <button class="btn btn-warning" id="{{row[0]}}" type="button" onclick="mark_as_read()">Mark as read</button>
+                            <button class="btn btn-secondary" id="{{row[0]}}" type="button" onclick="reply()">Reply</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+                {% for row in read %}
+                <div class="container mt-5">
+                    <div class="message-list">
+                        <div class="message-item">
+    
+                            <p><strong>{{row[2]}}</strong>:  {{row[1]}}</p>
+                            <p><small>Message: {{row[4]}}</small></p>
+                            <p><small>Received: {{row[6]}}</small></p>
+                            <button class="btn btn-warning" id="{{row[0]}}" type="button" onclick="mark_as_unread()">Mark as unread</button>
+                            <button class="btn btn-secondary" id="{{row[0]}}" type="button" onclick="reply()">Reply</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        
+      </div>
+</div>
+
+
+
+
+
+{% endblock %}

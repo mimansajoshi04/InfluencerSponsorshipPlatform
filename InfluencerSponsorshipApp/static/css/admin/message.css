@@ -1,0 +1,27 @@
+.messages{
+    
+    margin-left: 23%;
+    margin-right:23%;
+    padding:10px;
+    border-radius: 5px;
+    background-color: rgb(7, 33, 99);
+    color: white;
+}
+
+.message-list {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+.message-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #a10000;
+}
+.message-item:hover {
+    background-color: #065eb6;
+}

@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 from flask_login import login_user,logout_user,login_required,LoginManager,current_user
 
 from application.models.user import User,Sponsor
+from application.models.messages import *
 
 
 @app.route('/sponsor/getDetails',methods=["GET","POST"])
@@ -58,7 +59,36 @@ def sponsorDashboard():
 
         username = request.form["username"]
         complain = request.form["complain"]
-        return "bye"
+
+        time = datetime.now()
+        
+
+        with db.engine.begin() as connection:
+            query = text("SELECT username FROM user WHERE userType = :userType")
+            details = {"userType":"admin"}
+
+            results = connection.execute(query,details)
+            rows = results.fetchall()
+
+        
+            
+        for r in rows:
+            adminUsername = r[0]
+
+            message = Message("User Flagged Request",complain,username,adminUsername,time)
+            db.session.add(message)
+            db.session.commit()
+
+        
+            with db.engine.begin() as connection:
+                query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+                details = {"username":adminUsername}
+                connection.execute(query,details)
+
+
+
+
+        return render_template("sponsor/dashboard.html",username = session["username"],flagged=row[1],new=row[2],method="GET")
     
     return render_template("sponsor/dashboard.html",username = session["username"],flagged=row[1],new=row[2])
 

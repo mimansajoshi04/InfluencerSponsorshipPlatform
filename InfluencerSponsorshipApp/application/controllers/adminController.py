@@ -447,3 +447,57 @@ def deleteAdminAccount():
     return redirect(url_for("login"))
 
     
+@app.route('/admin/messages')
+def adminMessages():
+
+    with db.engine.begin() as connection:
+        query = text("SELECT * FROM message WHERE sent_to = :username")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        all = results.fetchall()
+
+        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 1")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        read = results.fetchall()
+
+        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 0")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        unread = results.fetchall()
+
+    if unread == []:
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 0 WHERE username = :username")
+            details = {"username":session["username"]}
+            connection.execute(query,details)
+
+    else:
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+            details = {"username":session["username"]}
+            connection.execute(query,details)
+    
+    return render_template("admin/adminMessages.html",all=all,read=read,unread=unread,username = session["username"])
+
+@app.route("/admin/mark_as_read/<id>")
+def markAsRead(id):
+    with db.engine.begin() as connection:
+        query = text("UPDATE message SET read = 1 WHERE id = :id")
+        details = {"id":id}
+        connection.execute(query,details)
+
+    return redirect(url_for("adminMessages"))
+
+@app.route("/admin/mark_as_unread/<id>")
+def markAsUnread(id):
+    with db.engine.begin() as connection:
+        query = text("UPDATE message SET read = 0 WHERE id = :id")
+        details = {"id":id}
+        connection.execute(query,details)
+
+    return redirect(url_for("adminMessages"))
+

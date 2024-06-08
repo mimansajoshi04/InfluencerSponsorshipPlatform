@@ -14,6 +14,9 @@ function settings(){
     window.location.href = '/admin/settings';
 }
 
+function see_messages(){
+    window.location.href = '/admin/messages';
+}
 
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -25,3 +28,4 @@ document.addEventListener("DOMContentLoaded", function() {
         toast.classList.remove("show");
     }, 3000); 
 });
+
