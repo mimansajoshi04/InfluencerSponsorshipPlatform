@@ -41,6 +41,7 @@
                         <p><small>Received: {{row[6]}}</small></p>
                         {% if row[5] == 0 %}
                             <button class="btn btn-warning" id="{{row[0]}}" type="button" onclick="mark_as_read()">Mark as read</button>
+                            <button class="btn btn-secondary" id="{{row[0]}}" type="button" onclick="reply()">Reply</button>
                         {% else %}    
                             <button class="btn btn-info" id="{{row[0]}}" type="button" onclick="mark_as_unread()">Mark as unread</button>
                             <button class="btn btn-secondary" id="{{row[0]}}" type="button" onclick="reply()">Reply</button>

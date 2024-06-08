@@ -103,9 +103,9 @@
                               <li class="list-group-item">Email: {{users[j][3]}}</li>
                             </ul>
                             <div class="card-body">
-                                {% if users[j][6] ==0 %}
+                                {% if users[j][6] == 0 and users[j][2] != "admin" %}
                                     <button type="button" class="btn btn-primary" onclick="flag_user()" id="{{users[j][1]}}">Flag User</button>
-                                {% else %}
+                                {% elif users[j][2]!="admin" %}
                                     <button type="button"  class="btn btn-warning" onclick="unflag_user()" id="{{users[j][1]}}">Unflag User</button>
                                 {% endif %}
                               <button type="button" class="btn btn-primary" id="{{users[j][1]}}" onclick="see_details()">See Details</button>

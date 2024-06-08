@@ -7,6 +7,39 @@ from flask_login import login_user,logout_user,login_required,LoginManager,curre
 from application.models.user import User,Sponsor
 from application.models.messages import *
 
+@app.route("/sponsor/send_message",methods=["POST"])
+@login_required
+def sendMessage():
+    username = request.form["username"]
+    complain = request.form["complain"]
+
+    time = datetime.now()
+        
+
+    with db.engine.begin() as connection:
+        query = text("SELECT username FROM user WHERE userType = :userType")
+        details = {"userType":"admin"}
+
+        results = connection.execute(query,details)
+        rows = results.fetchall()
+
+        
+            
+    for r in rows:
+        adminUsername = r[0]
+
+        message = Message("User Flagged Request",complain,username,adminUsername,time)
+        db.session.add(message)
+        db.session.commit()
+
+        
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+            details = {"username":adminUsername}
+            connection.execute(query,details)
+
+    flash("Complain has been sent!")
+    return redirect(url_for("sponsorDashboard"))
 
 @app.route('/sponsor/getDetails',methods=["GET","POST"])
 def sponsorDetails():
@@ -113,73 +146,105 @@ def sponsorSettings():
         
 
     if request.method == "POST":
+        try:
+            name = request.form["name"]
+            username = request.form["username"]
+            email = request.form["email"]
+            industry = request.form["industry"]
+            budget = request.form["budget"]
 
-        name = request.form["name"]
-        username = request.form["username"]
-        email = request.form["email"]
-        industry = request.form["industry"]
-        budget = request.form["budget"]
 
+            with db.engine.begin() as connection:
 
-        with db.engine.begin() as connection:
-
-            orignalUN = session["username"]
+                orignalUN = session["username"]
             
-            if username != orignalUN:
-                query = text("SELECT username FROM user WHERE username = :username")
-                details = {"username":username}
+                if username != orignalUN:
+                    query = text("SELECT username FROM user WHERE username = :username")
+                    details = {"username":username}
 
-                results = connection.execute(query,details)
+                    results = connection.execute(query,details)
             
 
-                if results.fetchall() != []:
-                    flash("Username already exists. Try another username.")
-                    return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],new=row[0],method="GET")
+                    if results.fetchall() != []:
+                        flash("Username already exists. Try another username.")
+                        return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],new=row[0],method="GET")
             
-            query = text("SELECT email FROM user WHERE username = :user")
-            details = {"user":session["username"]}
-
-            results = connection.execute(query,details)
-
-            orignalEM = results.fetchall()[0][0]
-
-            if email!= orignalEM:
-            
-                query = text("SELECT email FROM user WHERE email = :email")
-                details = {"email":email}
+                query = text("SELECT email FROM user WHERE username = :user")
+                details = {"user":session["username"]}
 
                 results = connection.execute(query,details)
 
+                orignalEM = results.fetchall()[0][0]
+
+                if email!= orignalEM:
+            
+                    query = text("SELECT email FROM user WHERE email = :email")
+                    details = {"email":email}
+
+                    results = connection.execute(query,details)
+
             
 
-                if results.fetchall() != []:
-                    flash("Email already exists. Try another email.")
-                    return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],new=row[0],method="GET")
+                    if results.fetchall() != []:
+                        flash("Email already exists. Try another email.")
+                        return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],new=row[0],method="GET")
 
 
-            query = text("UPDATE user SET username = :username, email = :email WHERE username = :user")
-            details = {"username":username,"email":email,"user" :session["username"]}
+                query = text("UPDATE user SET username = :username, email = :email WHERE username = :user")
+                details = {"username":username,"email":email,"user" :session["username"]}
 
-            connection.execute(query,details)
+                connection.execute(query,details)
 
-            query = text("UPDATE sponsor SET username = :username, email = :email, companyName = :companyName, budget = :budget, industry = :industry WHERE username = :user")
-            details = {"companyName":name,"username":username,"email":email,"user" :session["username"],"budget":budget,"industry":industry}
+                query = text("UPDATE sponsor SET username = :username, email = :email, companyName = :companyName, budget = :budget, industry = :industry WHERE username = :user")
+                details = {"companyName":name,"username":username,"email":email,"user" :session["username"],"budget":budget,"industry":industry}
 
-            connection.execute(query,details)
+                connection.execute(query,details)
 
-            flash("User details edited!")
+                flash("User details edited!")
 
-            query = text("SELECT sponsor.companyName,user.username,user.email,sponsor.industry,sponsor.budget,user.isflagged FROM user JOIN sponsor ON user.username = sponsor.username WHERE user.username = :username")
-            details = {"username": username}
+                query = text("SELECT sponsor.companyName,user.username,user.email,sponsor.industry,sponsor.budget,user.isflagged FROM user JOIN sponsor ON user.username = sponsor.username WHERE user.username = :username")
+                details = {"username": username}
 
-            results = connection.execute(query,details)
+                results = connection.execute(query,details)
 
-            userDetails = results.fetchall()
+                userDetails = results.fetchall()
 
-            session["username"] = username
+                session["username"] = username
 
 
-            return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],industry=indus,flagged=userDetails[0][5],new=row[0],method="GET")
+                return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],industry=indus,flagged=userDetails[0][5],new=row[0],method="GET")
+            
+        except KeyError:
+            username = request.form["username"]
+            complain = request.form["complain"]
+
+            time = datetime.now()
+        
+
+            with db.engine.begin() as connection:
+                query = text("SELECT username FROM user WHERE userType = :userType")
+                details = {"userType":"admin"}
+
+                results = connection.execute(query,details)
+                rows = results.fetchall()
+
+        
+            
+            for r in rows:
+                adminUsername = r[0]
+
+                message = Message("User Flagged Request",complain,username,adminUsername,time)
+                db.session.add(message)
+                db.session.commit()
+
+        
+                with db.engine.begin() as connection:
+                    query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+                    details = {"username":adminUsername}
+                    connection.execute(query,details)
+
+            flash("Complain has been sent!")
+            return redirect(url_for("sponsorSettings"))
     
 
     return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],industry=indus,flagged=userDetails[0][5],new=row[0])

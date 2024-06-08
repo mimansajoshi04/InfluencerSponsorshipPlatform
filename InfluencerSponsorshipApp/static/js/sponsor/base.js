@@ -23,9 +23,9 @@ document.addEventListener("DOMContentLoaded",function(){
     
     send_flag_request.addEventListener("submit",function(event){
         event.preventDefault();
- 
-        send_flag_request.submit();
-        window.onload = "/sponsor/dashboard";
+        id = document.getElementById("send_flag_request");
+        id.submit();
+        window.onload = "/sponsor/send_message";
         return;
 
     });
