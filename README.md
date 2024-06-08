@@ -9,6 +9,7 @@ Check the python version using the given command: **python3 --version**
  - pip install flask_login
  - pip install flask_sqlalchemy
  - pip install sqlachemy
+ - pip install flask_cors
 
 **We would be using the SQLite Database, so to check results you can install the DB Browser from the link below**:
   - https://sqlitebrowser.org/dl/
