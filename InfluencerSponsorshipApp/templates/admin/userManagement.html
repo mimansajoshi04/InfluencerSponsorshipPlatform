@@ -85,11 +85,14 @@
                             {% else %}
                             <span class="badge text-bg-secondary">Inactive</span>
                             {% endif %}
+                            <br>
 
                             {% if users[j][2]=="admin" %}
-                                <img src="{{url_for('static',filename='img/person-gear.svg')}}" class="card-img-top" alt="..." width="100px" height="100px">
+                                <img src="{{url_for('static',filename='img/person-gear.svg')}}" class="card-img-top" alt="..." width="90px" height="90px">
+                            {% elif users[j][2]=="influencer" %}
+                                <img src="{{url_for('static',filename='img/person-bounding-box.svg')}}" class="card-img-top" alt="..." width="90px" height="90px">
                             {% else %}
-                                <img src="..." class="card-img-top" alt="...">
+                            <img src="{{url_for('static',filename='img/cash-stack.svg')}}" class="card-img-top" alt="..." width="90px" height="90px">
                             {% endif %}
                             <div class="card-body">
                               <h5 class="card-title"><b>{{users[j][1]}}</b></h5>

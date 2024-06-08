@@ -3,11 +3,16 @@
 {% block title %}User Management{% endblock %}
 
 {% block css %}
-    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/userManagement.css')}}">
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/user_details.css')}}">
 {% endblock %}
 
-{% block js %}  
-    <script src="{{url_for('static',filename='js/admin/userManagement.js')}}"></script>
+{% block js%}
+    <script>
+        function back(){
+            window.history.back();
+        }
+
+    </script>
 {% endblock %}
 
 
@@ -15,5 +20,66 @@
 
 {% block content %}
 
+<div class="details">
+
+    {% if userType =="admin" %}
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">username:  {{userDetails[2]}}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Name: {{userDetails[1]}}</li>
+          <li class="list-group-item">Email: {{userDetails[3]}}</li>
+          <li class="list-group-item">Role: {{userDetails[4]}}</li>
+        </ul>
+      </div>
+
+    {% elif userType=="influencer" %}
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">username:  {{userDetails[2]}}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Name: {{userDetails[1]}}</li>
+          <li class="list-group-item">Email: {{userDetails[3]}}</li>
+          <li class="list-group-item">Role: {{userDetails[9]}}</li>
+          <li class="list-group-item">Category: {{userDetails[4]}}</li>
+          <li class="list-group-item">Niche: {{userDetails[5]}}</li>
+          <li class="list-group-item">Followers: {{userDetails[6]}}</li>
+          {% if userDetails[7]=="" %}
+            <li class="list-group-item">Instaid: Insta id not provided.</li>
+            {%else %}
+            <li class="list-group-item">Instaid: {{userDetails[7]}}</li>
+        {% endif %}
+        </ul>
+        <div class="card-body">
+            {% if userDetails[7]!="" %}
+          <a type="button" href="https://www.instagram.com/{{userDetails[7]}}" class="btn btn-primary" target="_blank">Visit Instagram</a>
+          {% endif %}
+
+        </div>
+      </div>
+
+    {% else %}
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">username:  {{userDetails[2]}}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Name: {{userDetails[1]}}</li>
+            <li class="list-group-item">Email: {{userDetails[3]}}</li>
+            <li class="list-group-item">Role: {{userDetails[6]}}</li>
+            <li class="list-group-item">Budget: {{userDetails[4]}}</li>
+            <li class="list-group-item">Industry: {{userDetails[8]}}</li>
+        </ul>
+      </div>
+    
+    {% endif %}
+
+    <br>
+    <button class="btn btn-primary" type="button" onclick="back()">Back</button>
+
+</div>
+    <br>
 
 {% endblock %}

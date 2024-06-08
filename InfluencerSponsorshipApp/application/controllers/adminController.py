@@ -315,10 +315,8 @@ def see_user_details(username):
             details = {"username": username}
             results = connection.execute(query,details)
             userDetails = results.fetchone()
-            return f"{userDetails}"
-
-
-            return "admin"
+            
+            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],userType="admin")
         
         if row[0] == "influencer":
 
@@ -326,9 +324,8 @@ def see_user_details(username):
             details = {"username": username}
             results = connection.execute(query,details)
             userDetails = results.fetchone()
-            return f"{userDetails}"
-
-            return "influencer"
+            
+            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],userType="influencer")
         
         if row[0] == "sponsor":
 
@@ -337,13 +334,13 @@ def see_user_details(username):
             results = connection.execute(query,details)
             userDetails = results.fetchone()
             
-            return f"{userDetails}"
-            return "sponsor"
+            return render_template("admin/user_details.html",userDetails=userDetails,username=session["username"],userType="sponsor")
 
     return render_template("admin/user_details.html")
 
 @app.route("/admin/delete_user/<username>")
 def deleteUser(username):
+
     
     if username != session["username"]:
         with db.engine.connect() as connection:
@@ -391,3 +388,38 @@ def deleteUser(username):
         flash("You cannot delete the user as you are logged in! Please check settings to delete account.")
         return redirect(url_for("userManagement"))
         
+
+@app.route("/admin/delete_account")
+def deleteAccount():
+
+
+    
+
+    with db.engine.begin() as connection:
+        query = text("SELECT count(*) FROM user WHERE userType = 'admin'")
+        results = connection.execute(query)
+        count = results.fetchone()
+
+        if count[0]==1:
+            flash("This is the only admin account currently present. Deletion not allowed.")
+            return redirect(url_for("adminSettings"))
+
+        
+    username =session["username"]
+    session.pop("username",None)
+
+    user = User.query.filter_by(username=username).first()
+    db.session.delete(user)
+    db.session.commit()
+    
+    user = Admin.query.filter_by(username=username).first()
+    db.session.delete(user)
+    db.session.commit()
+    
+    
+    flash(f"User {username} has been permanantly deleted.")
+    logout_user()
+
+    return redirect(url_for("login"))
+
+    

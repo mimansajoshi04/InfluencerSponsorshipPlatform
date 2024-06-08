@@ -15,3 +15,7 @@ function edit(){
 
     return true;
 }
+
+function delete_account(){
+    window.location.href = "/admin/delete_account";
+}
