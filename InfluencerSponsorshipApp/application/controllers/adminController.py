@@ -5,6 +5,7 @@ from werkzeug.security import check_password_hash
 from flask_login import login_user,logout_user,login_required,LoginManager,current_user
 
 from application.models.user import *
+from application.models.messages import *
 
 
 @app.route("/admin/dashboard",methods=["GET","POST"])
@@ -448,26 +449,33 @@ def deleteAdminAccount():
 
     
 @app.route('/admin/messages')
+@login_required
 def adminMessages():
 
     with db.engine.begin() as connection:
-        query = text("SELECT * FROM message WHERE sent_to = :username")
+        query = text("SELECT * FROM message WHERE sent_to = :username OR sent_by = :username ORDER BY id DESC")
         details = {"username":session["username"]}
         results = connection.execute(query,details)
 
         all = results.fetchall()
 
-        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 1")
+        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 1 ORDER BY id DESC")
         details = {"username":session["username"]}
         results = connection.execute(query,details)
 
         read = results.fetchall()
 
-        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 0")
+        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 0 ORDER BY id DESC")
         details = {"username":session["username"]}
         results = connection.execute(query,details)
 
         unread = results.fetchall()
+
+        query = text("SELECT * FROM message WHERE sent_by = :username ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        sent = results.fetchall()
 
     if unread == []:
         with db.engine.begin() as connection:
@@ -481,10 +489,10 @@ def adminMessages():
             details = {"username":session["username"]}
             connection.execute(query,details)
     
-    return render_template("admin/adminMessages.html",all=all,read=read,unread=unread,username = session["username"])
+    return render_template("admin/adminMessages.html",all=all,read=read,unread=unread,sent = sent,username = session["username"])
 
 @app.route("/admin/mark_as_read/<id>")
-def markAsRead(id):
+def markAsReadA(id):
     with db.engine.begin() as connection:
         query = text("UPDATE message SET read = 1 WHERE id = :id")
         details = {"id":id}
@@ -493,7 +501,7 @@ def markAsRead(id):
     return redirect(url_for("adminMessages"))
 
 @app.route("/admin/mark_as_unread/<id>")
-def markAsUnread(id):
+def markAsUnreadA(id):
     with db.engine.begin() as connection:
         query = text("UPDATE message SET read = 0 WHERE id = :id")
         details = {"id":id}
@@ -501,3 +509,68 @@ def markAsUnread(id):
 
     return redirect(url_for("adminMessages"))
 
+@app.route("/admin/send_message",methods=["GET","POST"])
+@login_required
+def sendAMessage():
+
+    if request.method =="POST":
+
+        reciever = request.form["username"]
+
+        with db.engine.begin() as connection:
+            query = text("SELECT username FROM user WHERE username = :username")
+            details = {"username":reciever}
+            results = connection.execute(query,details)
+            if results.fetchone() is None:
+                flash("User does not exist.")
+                return redirect(url_for("sendAMessage"))
+
+
+        title = request.form["title"]
+        message = request.form["message"]
+        sent_by = session["username"]
+
+        time = datetime.now()
+
+
+        message = Message(title,message,sent_by,reciever,time,"sent",-1)
+        db.session.add(message)
+        db.session.commit()
+
+        
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+            details = {"username":reciever}
+            connection.execute(query,details)
+
+        flash("Message has been sent!")
+        return redirect(url_for("adminMessages"))
+
+    return render_template("/admin/send_message.html",username=session["username"])
+
+@app.route("/admin/reply/<int:id>/<reciever>",methods=["GET","POST"])
+@login_required
+def adminreply(id,reciever):
+    
+    if request.method=="POST":
+        title = request.form["title"]
+        message = request.form["message"]
+        sent_by = session["username"]
+
+        time = datetime.now()
+
+
+        message = Message(title,message,sent_by,reciever,time,"reply",id)
+        db.session.add(message)
+        db.session.commit()
+
+        
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+            details = {"username":reciever}
+            connection.execute(query,details)
+
+        flash("Message has been sent!")
+        return redirect(url_for("adminMessages"))
+    else:
+        return render_template("admin/replyMessage.html",username=session["username"])

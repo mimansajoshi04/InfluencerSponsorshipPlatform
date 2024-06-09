@@ -14,7 +14,11 @@
 {% endblock %}
 
 {% block js %}  
-    <script src="{{url_for('static',filename='js/sponsor/dashboard.js')}}"></script>
+    <script>
+      function send_messages(){
+        window.location.href = "/sponsor/send_message";
+      }
+    </script>
 {% endblock %}
 
 
@@ -47,6 +51,16 @@
           <h5 class="card-title">Find influencers</h5>
           <p class="card-text">Using this operation you can find all the influencers and send them ad requests for campaigns.</p>
           <a href="/sponsor/find_influencers" class="btn btn-primary">Find Influencers</a><br><br>
+        </div>
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/person-arms-up.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Messages</h5>
+          <p class="card-text">Using this operation you can send messages and check recieved messages.</p><br>
+          <button  class="btn btn-primary" type="button" onclick="messages()">Check Messages</button><br><br>
+          <button  class="btn btn-primary" type="button" onclick="send_messages()">Send Message</button><br><br>
         </div>
       </div>
 

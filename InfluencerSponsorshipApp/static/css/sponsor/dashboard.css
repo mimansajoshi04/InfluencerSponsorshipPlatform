@@ -1,9 +1,8 @@
 
 
 .operations{
-    max-width: 61%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 11%;
+    margin-right: 11%;
     display: flex;
     justify-content: space-between;
 }

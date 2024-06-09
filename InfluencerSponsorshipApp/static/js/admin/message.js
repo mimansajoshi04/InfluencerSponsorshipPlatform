@@ -15,3 +15,7 @@ function reply(){
         window.location.href="/admin/reply/" + event.target.id;
     });
 }
+
+function send_message(){
+    window.location.href = "/admin/send_message";
+  }

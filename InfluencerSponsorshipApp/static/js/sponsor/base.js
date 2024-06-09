@@ -14,6 +14,10 @@ function campaigns(){
 
 }
 
+function messages(){
+    window.location.href = "/sponsor/messages";
+}
+
 function settings(){
     window.location.href = "/sponsor/settings";
 }
@@ -25,7 +29,7 @@ document.addEventListener("DOMContentLoaded",function(){
         event.preventDefault();
         id = document.getElementById("send_flag_request");
         id.submit();
-        window.onload = "/sponsor/send_message";
+        window.onload = "/sponsor/dashboard";
         return;
 
     });

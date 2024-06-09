@@ -1,0 +1,66 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Add User Page{% endblock %}
+
+{% block css%}
+        <link rel="stylesheet" href ="{{ url_for('static', filename = 'css/admin/addUser.css') }}">
+{% endblock %}
+
+{% block js%}
+        <script>
+            function finish(){
+                username = document.getElementById("username").value;
+                if(username.includes("@")){
+                    alert("Username cannot contain '@'");
+                    return false;
+                }
+                return true;
+            }
+        </script>
+{% endblock %}
+
+{%block user %}{{username}}{% endblock %}
+
+
+{% block content %}
+    
+        <body>
+    
+            <div class="form-area">
+    
+                <div class="form">
+    
+                    <h1>
+                        Send message
+                    </h1>
+                    <br>
+                    <form onsubmit="return finish();" method="post">
+
+                          <br>
+                        
+                        <label for="title">Title </label>
+                        <input type="text" class="form-control" name="title" id="title" placeholder="Title"  required>
+                        <br><br>
+
+                        <label for="message">Message </label>
+                        <textarea type="text" class="form-control" name="message" id="message" placeholder="message: minimum 10 characters"  required></textarea>
+                        <br><br>
+
+
+                        </div>
+                        <br>
+
+                        <button type="submit" class="btn btn-primary" onclick="finish()">Send</button>
+
+    
+                    </form>
+                </div>
+    
+            </div>
+    
+    
+        </body>
+        <br>
+        <br>
+
+    {% endblock %}

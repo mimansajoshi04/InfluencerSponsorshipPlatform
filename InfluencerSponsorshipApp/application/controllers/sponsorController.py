@@ -7,39 +7,42 @@ from flask_login import login_user,logout_user,login_required,LoginManager,curre
 from application.models.user import User,Sponsor
 from application.models.messages import *
 
-@app.route("/sponsor/send_message",methods=["POST"])
+@app.route("/sponsor/send_message",methods=["GET","POST"])
 @login_required
-def sendMessage():
-    username = request.form["username"]
-    complain = request.form["complain"]
+def sendSMessage():
+    if request.method =="POST":
+        reciever = request.form["username"]
 
-    time = datetime.now()
-        
+        with db.engine.begin() as connection:
+            query = text("SELECT username FROM user WHERE username = :username")
+            details = {"username":reciever}
+            results = connection.execute(query,details)
+            if results.fetchone() is None:
+                flash("User does not exist.")
+                return redirect(url_for("sendAMessage"))
 
-    with db.engine.begin() as connection:
-        query = text("SELECT username FROM user WHERE userType = :userType")
-        details = {"userType":"admin"}
 
-        results = connection.execute(query,details)
-        rows = results.fetchall()
+        title = request.form["title"]
+        message = request.form["message"]
+        sent_by = session["username"]
 
-        
-            
-    for r in rows:
-        adminUsername = r[0]
+        time = datetime.now()
 
-        message = Message("User Flagged Request",complain,username,adminUsername,time)
+
+        message = Message(title,message,sent_by,reciever,time,"sent",-1)
         db.session.add(message)
         db.session.commit()
 
         
         with db.engine.begin() as connection:
             query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
-            details = {"username":adminUsername}
+            details = {"username":reciever}
             connection.execute(query,details)
 
-    flash("Complain has been sent!")
-    return redirect(url_for("sponsorDashboard"))
+        flash("Message has been sent!")
+        return redirect(url_for("sponsorMessages"))
+
+    return render_template("/sponsor/send_message.html",username=session["username"])
 
 @app.route('/sponsor/getDetails',methods=["GET","POST"])
 def sponsorDetails():
@@ -108,7 +111,7 @@ def sponsorDashboard():
         for r in rows:
             adminUsername = r[0]
 
-            message = Message("User Flagged Request",complain,username,adminUsername,time)
+            message = Message("User Flagged Request",complain,username,adminUsername,time,"sent",-1)
             db.session.add(message)
             db.session.commit()
 
@@ -233,7 +236,7 @@ def sponsorSettings():
             for r in rows:
                 adminUsername = r[0]
 
-                message = Message("User Flagged Request",complain,username,adminUsername,time)
+                message = Message("User Flagged Request",complain,username,adminUsername,time,"sent",-1)
                 db.session.add(message)
                 db.session.commit()
 
@@ -268,7 +271,91 @@ def deleteSponsorAccount():
 
     return redirect(url_for("login"))
 
-# hi
 
+@app.route("/sponsor/mark_as_read/<id>")
+def markAsReadS(id):
+    with db.engine.begin() as connection:
+        query = text("UPDATE message SET read = 1 WHERE id = :id")
+        details = {"id":id}
+        connection.execute(query,details)
+
+    return redirect(url_for("adminMessages"))
+
+@app.route("/sponsor/mark_as_unread/<id>")
+def markAsUnreadS(id):
+    with db.engine.begin() as connection:
+        query = text("UPDATE message SET read = 0 WHERE id = :id")
+        details = {"id":id}
+        connection.execute(query,details)
+
+    return redirect(url_for("adminMessages"))
+
+@app.route("/sponsor/reply/<int:id>/<reciever>",methods=["GET","POST"])
+@login_required
+def sponsorreply(id,reciever):
     
+    if request.method=="POST":
+        title = request.form["title"]
+        message = request.form["message"]
+        sent_by = session["username"]
 
+        time = datetime.now()
+
+
+        message = Message(title,message,sent_by,reciever,time,"reply",id)
+        db.session.add(message)
+        db.session.commit()
+
+        
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+            details = {"username":reciever}
+            connection.execute(query,details)
+
+        flash("Message has been sent!")
+        return redirect(url_for("sponsorMessages"))
+    else:
+        return render_template("sponsor/replyMessage.html",username=session["username"])
+#
+@app.route('/sponsor/messages')
+@login_required
+def sponsorMessages():
+
+    with db.engine.begin() as connection:
+        query = text("SELECT * FROM message WHERE sent_to = :username OR sent_by = :username ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        all = results.fetchall()
+
+        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 1 ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        read = results.fetchall()
+
+        query = text("SELECT * FROM message WHERE sent_to = :username AND read = 0 ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        unread = results.fetchall()
+
+        query = text("SELECT * FROM message WHERE sent_by = :username ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        sent = results.fetchall()
+
+    if unread == []:
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 0 WHERE username = :username ")
+            details = {"username":session["username"]}
+            connection.execute(query,details)
+
+    else:
+        with db.engine.begin() as connection:
+            query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+            details = {"username":session["username"]}
+            connection.execute(query,details)
+    
+    return render_template("sponsor/messages.html",all=all,read=read,unread=unread,username = session["username"],sent=sent)

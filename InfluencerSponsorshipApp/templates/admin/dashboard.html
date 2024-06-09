@@ -7,7 +7,11 @@
 {% endblock %}
 
 {% block js %}  
-    <script src="{{url_for('static',filename='js/admin/dashboard.js')}}"></script>
+    <script >
+      function send_messages(){
+        window.location.href = "/admin/send_message";
+      }
+    </script>
 {% endblock %}
 
 {%block user %}{{username}}{% endblock %}
@@ -48,9 +52,10 @@
       <div class="card" style="width: 18rem; padding: 20px;">
         <img src="{{url_for('static',filename='img/person-arms-up.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
         <div class="card-body">
-          <h5 class="card-title">Active Users</h5>
-          <p class="card-text">Using this operation you can see all the active users and their relevant statistics.</p><br>
-          <a href="#" class="btn btn-primary">Check Active Users</a><br><br>
+          <h5 class="card-title">Messages</h5>
+          <p class="card-text">Using this operation you can send messages and check recieved messages.</p><br>
+          <button  class="btn btn-primary" type="button" onclick="see_messages()">Check Messages</button><br><br>
+          <button  class="btn btn-primary" type="button" onclick="send_messages()">Send Message</button><br><br>
         </div>
       </div>
 
