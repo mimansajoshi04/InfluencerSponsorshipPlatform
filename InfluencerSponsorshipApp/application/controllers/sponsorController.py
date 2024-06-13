@@ -316,7 +316,64 @@ def sponsorreply(id,reciever):
         return redirect(url_for("sponsorMessages"))
     else:
         return render_template("sponsor/replyMessage.html",username=session["username"])
-#
+
+@app.route("/sponsor/addCampaign",methods=["GET","POST"])
+def addSponsorCampaign():
+
+    if request.method=="POST":
+        return request.form
+        try:
+            name = request.form["name"]
+            description = request.form["description"]
+            budget = request.form["budget"]
+            start_date = request.form["start_date"]
+            end_date = request.form["end_date"]
+            visibility = request.form["visibility"]
+            goals = request.form["goals"]
+            category = request.form["category"]
+            niche = request.form["join"]
+            industry = request.form["industry"]
+
+            return request.form
+
+        except KeyError:
+            username = request.form["username"]
+            complain = request.form["complain"]
+
+            time = datetime.now()
+        
+
+            with db.engine.begin() as connection:
+                query = text("SELECT username FROM user WHERE userType = :userType")
+                details = {"userType":"admin"}
+
+                results = connection.execute(query,details)
+                rows = results.fetchall()
+
+        
+            
+            for r in rows:
+                adminUsername = r[0]
+
+                message = Message("User Flagged Request",complain,username,adminUsername,time,"sent",-1)
+                db.session.add(message)
+                db.session.commit()
+
+        
+                with db.engine.begin() as connection:
+                    query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
+                    details = {"username":adminUsername}
+                    connection.execute(query,details)
+
+            flash("Complain has been sent!")
+            return redirect(url_for("sponsorSettings"))
+
+
+
+    indus=["Aerospace","Automotive","Education","Energy","Entertainment","Finance","Healthcare","Hospitality","Retail","Technology","Telecommunications"]
+    category = ["Arts and Entertainment","Business","Designer","Education","Fashion and Beauty","Finance","Health and Wellness","Public Figure","Technology","Travel"]
+    return render_template("sponsor/addCampaign.html",username=session["username"],industry=indus,category=category)
+
 @app.route('/sponsor/messages')
 @login_required
 def sponsorMessages():

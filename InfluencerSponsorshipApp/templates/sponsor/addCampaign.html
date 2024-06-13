@@ -1,0 +1,142 @@
+{% extends "sponsor/base.html" %}
+
+{% block title %}Add Campaign{% endblock %}
+
+{% block css %}
+    <style>
+      .form-control{
+    padding: 5px;
+      }
+
+.form-area{
+    background-color: rgba(12, 40, 113, 1);
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin-left: 37%;
+    margin-right: 37%;
+    padding: 20px 40px;
+    border-radius: 10px;
+}
+
+
+body{
+    background-color: bisque;
+}
+
+.items{
+  display: flex;
+}
+
+.data{
+  padding: 10px 20px;
+}
+
+    </style>
+{% endblock %}
+
+{% block js %}  
+    <script src="{{url_for('static',filename='js/sponsor/addCampaign.js')}}"></script>
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div>
+
+
+    <div class="form-area">
+    
+        <div class="form">
+
+            <h1>
+                Add Campaign
+            </h1>
+            <br>
+            <form  method="post" id="edit" onsubmit="return edit()">
+
+                <div class="items">
+                  <div class="data">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="name" required>
+                    <br>
+                    
+                    <label for="description">Description</label>
+                    <textarea type="text" class="form-control" name="description" id="description" placeholder="description" required></textarea>
+                    <br>
+    
+                    <label for="budget">Budget</label>
+                    <input type="number" class="form-control" name="budget" id="budget" placeholder="Amount in dollars" required>
+                    <br>
+    
+                    <label for="start_date">Start date</label>
+                    <input type="date" class="form-control" name="start_date" id="start_date"  required>
+                    <br>
+    
+                    <label for="end_date">End date</label>
+                    <input type="date" class="form-control" name="end_date" id="end_date"  required>
+                  </div>
+
+                  <div class="data">
+                    <label for="visibility">Visibility</label>
+                  <div class="input-group" id="visibility">
+                  <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="radio" value="public" id="public" name="visibility"><label for="public">Public</label><br><br>
+                  </div>
+                    <div class="input-group-text">
+                    <input class="form-check-input mt-0" type="radio" value="private" id="private" name="visibility"><label for="private"> Private</label>
+                  </div>
+                </div>
+                <br>
+
+                <label for="goals">Goals</label>
+                <textarea type="text" class="form-control" name="goals" id="goals" placeholder="goals" required></textarea>
+                <br>
+
+                <label  for="industry">Industry</label>
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="industry">Industry</label>
+                  <select class="form-select" id="industry" name="industry">
+                    <option selected>Choose...</option>
+                      {% for i in industry %}
+                          <option value="{{i}}">{{i}}</option>
+                      {% endfor %}
+
+                  </select>
+                </div>
+
+                <label for="category">Category</label>
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="category">Category</label>
+                  <select class="form-select" id="category" name="category">
+                    <option selected>Choose...</option>
+                    
+                      {% for i in category %}
+                          <option value="{{i}}">{{i}}</option>
+                      {% endfor %}
+
+                  </select>
+                </div>
+                
+                <label  for="niche">Niche</label>
+                  <div class="form-control" id="niche">
+
+                  </div>
+
+                  <input type="text" style="visibility: none;" id="join" name="niche">
+
+                  </div>
+                <br>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" onclick="edit()">Add Campaign</button>
+
+            </form>
+        </div>
+
+    </div>
+
+    
+
+{% endblock %}
