@@ -10,6 +10,10 @@ function user_management(){
     window.location.href = '/admin/user_management';
 }
 
+function stats(){
+    window.location.href = '/admin/stats';
+}
+
 function settings(){
     window.location.href = '/admin/settings';
 }

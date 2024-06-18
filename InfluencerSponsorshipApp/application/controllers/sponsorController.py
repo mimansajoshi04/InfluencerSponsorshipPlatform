@@ -6,6 +6,7 @@ from flask_login import login_user,logout_user,login_required,LoginManager,curre
 
 from application.models.user import User,Sponsor
 from application.models.messages import *
+from application.models.campaign import *
 
 @app.route("/sponsor/send_message",methods=["GET","POST"])
 @login_required
@@ -318,26 +319,19 @@ def sponsorreply(id,reciever):
         return render_template("sponsor/replyMessage.html",username=session["username"])
 
 @app.route("/sponsor/addCampaign",methods=["GET","POST"])
+@login_required
 def addSponsorCampaign():
 
+    indus=["Aerospace","Automotive","Education","Energy","Entertainment","Finance","Healthcare","Hospitality","Retail","Technology","Telecommunications"]
+    category = ["Arts and Entertainment","Business","Designer","Education","Fashion and Beauty","Finance","Health and Wellness","Public Figure","Technology","Travel"]
+
+    with db.engine.begin() as connection:
+        query = text("SELECT newMessages,isflagged FROM user WHERE username = :username")
+        result = connection.execute(query,{"username":session["username"]})
+        row = result.fetchone()
+
     if request.method=="POST":
-        return request.form
         try:
-            name = request.form["name"]
-            description = request.form["description"]
-            budget = request.form["budget"]
-            start_date = request.form["start_date"]
-            end_date = request.form["end_date"]
-            visibility = request.form["visibility"]
-            goals = request.form["goals"]
-            category = request.form["category"]
-            niche = request.form["join"]
-            industry = request.form["industry"]
-
-            return request.form
-
-        except KeyError:
-            username = request.form["username"]
             complain = request.form["complain"]
 
             time = datetime.now()
@@ -355,7 +349,7 @@ def addSponsorCampaign():
             for r in rows:
                 adminUsername = r[0]
 
-                message = Message("User Flagged Request",complain,username,adminUsername,time,"sent",-1)
+                message = Message("User Flagged Request",complain,session["username"],adminUsername,time,"sent",-1)
                 db.session.add(message)
                 db.session.commit()
 
@@ -366,13 +360,224 @@ def addSponsorCampaign():
                     connection.execute(query,details)
 
             flash("Complain has been sent!")
-            return redirect(url_for("sponsorSettings"))
+            return redirect(url_for("addSponsorCampaign"))
+
+            
+
+        except KeyError:
+            
+            name = request.form["name"]
+            description = request.form["description"]
+            budget = request.form["budget"]
+            start_date = request.form["start_date"]
+            end_date = request.form["end_date"]
+            visibility = request.form["visibility"]
+            goals = request.form["goals"]
+            category = request.form["category"]
+            niche = request.form["join"]
+            industry = request.form["industry"]
+
+            date = start_date.split("-")
+            start = datetime(int(date[0]),int(date[1]),int(date[2]))
 
 
+            date = end_date.split("-")
+            end = datetime(int(date[0]),int(date[1]),int(date[2]))
+
+            
+
+            with db.engine.begin() as connection:
+                sponsor  = Campaign(name,description,start,end,session["username"],visibility,niche,category,goals,int(budget),industry)
+                db.session.add(sponsor)
+                db.session.commit()
+
+            
+            flash("New campaign created! Click on Campaign to see.")
+            return render_template("sponsor/addCampaign.html",username=session["username"],industry=indus,category=category,new=row[0],flagged=row[1],method="GET")
+
+
+    
+    return render_template("sponsor/addCampaign.html",username=session["username"],industry=indus,category=category,new=row[0],flagged=row[1])
+
+
+@app.route("/sponsor/my_campaigns",methods=["GET","POST"])
+@login_required
+def sponsorCampaigns():
+
+    with db.engine.begin() as connection:
+        query = text("SELECT newMessages FROM user WHERE username = :username")
+        result = connection.execute(query,{"username":session["username"]})
+        row = result.fetchone()
+
+        query = text("SELECT * FROM campaign WHERE started_by=:username ORDER BY name")
+        result = connection.execute(query,{"username":session["username"]})
+        campaigns = result.fetchall()
+
+    if request.method =="POST":
+        try:
+            name = request.form["name"]
+            
+            try:
+                with db.engine.begin() as connection:
+                    query = text("SELECT * FROM campaign WHERE (name = :name OR name LIKE :show) AND (started_by=:username) ORDER BY name")
+                    result = connection.execute(query,{"name":name, "show": f"%{name}%","username":session["username"]})
+                    rows = result.fetchall()
+                    if rows is None:
+                        flash("No campaign found. Please check again.")
+                        return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+                    return render_template("sponsor/myCampaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+            except Exception as e:
+                flash(f"Error occurred: {e}")
+                return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+
+
+        except KeyError:
+
+            try:
+                niche = request.form["n"]
+                try:
+                    with db.engine.begin() as connection:
+                        query = text("SELECT * FROM campaign WHERE (niche = :n OR niche LIKE :show) AND (started_by=:username) ORDER BY name")
+                        result = connection.execute(query,{"n":niche, "show": f"%{niche}%","username":session["username"]})
+                        rows = result.fetchall()
+                        if rows is None:
+                            flash("No campaign found. Please check again.")
+                            return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+                        return render_template("sponsor/myCampaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+                except Exception as e:
+                    flash(f"Error occurred: {e}")
+                    return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+
+            except KeyError:
+
+                filterbychoice = request.form["filterbychoice"]
+                filterbyvalue = request.form["filterbyvalue"] 
+
+                try:
+                    if filterbychoice =="visibility":
+                        if filterbyvalue == "public":
+                            filterbyvalue = "public"
+                        else:
+                            filterbyvalue = "private"
+                        with db.engine.begin() as connection:
+                            query = text("SELECT * FROM campaign WHERE visibility = :filterbyvalue AND started_by=:username ORDER BY name")
+                            details = {"filterbyvalue" :filterbyvalue,"username":session["username"]}
+                            result = connection.execute(query,details)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No campaign found. Please check again.")
+                                return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("sponsor/myCampaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+                        
+                    elif filterbychoice =="isflagged":
+                        if filterbyvalue == "not flagged":
+                            filterbyvalue = 0
+                        else:
+                            filterbyvalue = 1
+                        with db.engine.begin() as connection:
+                            query = text("SELECT * FROM campaign WHERE isflagged = :filterbyvalue AND started_by=:username ORDER BY name")
+                            details = {"filterbyvalue" :filterbyvalue,"username":session["username"]}
+                            result = connection.execute(query,details)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No campaign found. Please check again.")
+                                return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("sponsor/myCampaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+                        
+                    elif filterbychoice =="status":
+                        date=datetime.now()
+                        if filterbyvalue == "on going":
+                            query = text(f"SELECT * FROM campaign WHERE end_date > '{date}' AND started_by = '{session["username"]}' AND start_date < '{date}' ORDER BY name")
+                        
+                        elif filterbyvalue == "scheduled":
+                            query = text(f"SELECT * FROM campaign WHERE start_date > '{date}' AND started_by = '{session["username"]}' ORDER BY name")
+                        
+                        else:
+                            query = text(f"SELECT * FROM campaign WHERE end_date < '{date}' AND started_by = '{session["username"]}' ORDER BY name")
+                        with db.engine.begin() as connection:
+                            
+                            result = connection.execute(query)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No campaign found. Please check again.")
+                                return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("sponsor/myCampaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+
+
+                    else:
+                        with db.engine.begin() as connection:
+                            query = text("SELECT * FROM campaign WHERE category = :filterbyvalue AND started_by=:username ORDER BY name")
+                            details = {"filterbyvalue" :filterbyvalue ,"username":session["username"]}
+                            result = connection.execute(query,details)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No user found. Please check again.")
+                                return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("sponsor/myCampaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+
+                except Exception as e:
+                    flash(f"Error occurred: {e}")
+                    return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
+
+
+    return render_template("sponsor/myCampaigns.html",username=session["username"],new=row[0],campaigns=campaigns)
+
+#hi
+@app.route("/sponsor/edit_campaign/<int:id>",methods=["GET","POST"])
+@login_required
+def editCampiagnDetails(id):
 
     indus=["Aerospace","Automotive","Education","Energy","Entertainment","Finance","Healthcare","Hospitality","Retail","Technology","Telecommunications"]
     category = ["Arts and Entertainment","Business","Designer","Education","Fashion and Beauty","Finance","Health and Wellness","Public Figure","Technology","Travel"]
-    return render_template("sponsor/addCampaign.html",username=session["username"],industry=indus,category=category)
+    
+    with db.engine.begin() as connection:
+        query = text("SELECT newMessages FROM user WHERE username = :username")
+        result = connection.execute(query,{"username":session["username"]})
+        row = result.fetchone()
+
+    with db.engine.begin() as connection:
+        query = text("SELECT * FROM campaign WHERE id = :id AND started_by=:username")
+        result = connection.execute(query,{"id":id,"username":session["username"]})
+        rows = result.fetchone()
+
+        if rows is None:
+            return redirect(url_for("sponsorCampaigns"))
+
+    if request.method=="POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        budget = request.form["budget"]
+        start_date = request.form["start_date"]
+        end_date = request.form["end_date"]
+        visibility = request.form["visibility"]
+        goals = request.form["goals"]
+        category = request.form["category"]
+        niche = request.form["niche"]
+        industry = request.form["industry"]
+
+        
+
+        date = start_date.split("-")
+        start = datetime(int(date[0]),int(date[1]),int(date[2]))
+
+        date = end_date.split("-")
+        end = datetime(int(date[0]),int(date[1]),int(date[2]))
+
+        with db.engine.begin() as connection:
+            query = text(f"UPDATE campaign SET name='{name}',description='{description}',budget={int(budget)}, start_date='{start}',end_date='{end}',visibility='{visibility}',goals='{goals}',category='{category}',niche='{niche}',industry='{industry}' WHERE id={int(id)}")
+            connection.execute(query)
+            flash("Campaign details edited successfully!")
+            return redirect(url_for("sponsorCampaigns"))
+
+    return render_template("/sponsor/editCampaign.html",username=session["username"],new=row[0],userDetails=rows,industry=indus,category=category)
 
 @app.route('/sponsor/messages')
 @login_required

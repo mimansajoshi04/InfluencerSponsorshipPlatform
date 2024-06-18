@@ -1,15 +1,29 @@
 
 
 .operations{
-    margin-left: 11%;
-    margin-right: 11%;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
     display: flex;
     justify-content: space-between;
 }
 
+.card-img-top{
+    width: 50%;
+    height: 50%;
+}
+
 .card{
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+
+    max-height: fit-content;
+    margin-top: auto;
+    margin-bottom: auto;
     box-shadow: 5px 5px 10px 2px rgb(98, 98, 99);
     transition: transform .2s;
+    
 }
 
 .card:hover{

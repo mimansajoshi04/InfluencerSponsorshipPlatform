@@ -31,8 +31,8 @@
         <img src="{{url_for('static',filename='img/people-fill.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
         <div class="card-body">
           <h5 class="card-title">Ad requests</h5>
-          <p class="card-text">Using this operation you can see all the ad requests with their current status.</p><br>
-          <a href="/sponsor/my_adRequests" class="btn btn-primary">My Ad Requests</a><br><br>
+          <p class="card-text">Using this operation you can see all the ad requests with their current status.</p><br><br>
+          <a href="/sponsor/my_adRequests" class="btn btn-primary">My Ad Requests</a><br>
         </div>
       </div>
 
@@ -40,8 +40,8 @@
         <img src="{{url_for('static',filename='img/file-earmark.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
         <div class="card-body">
           <h5 class="card-title">Campaigns</h5>
-          <p class="card-text">Using this operation you can see all the campaigns currently going on and the completed campaigns.</p>
-          <a href="/sponsor/my_campaigns" class="btn btn-primary">My Campaigns</a><br><br>
+          <p class="card-text">Using this operation you can see all the campaigns currently going on and the completed campaigns.</p><br>
+          <a href="/sponsor/my_campaigns" class="btn btn-primary">My Campaigns</a><br>
         </div>
       </div>
 
@@ -49,8 +49,8 @@
         <img src="{{url_for('static',filename='img/currency-rupee.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
         <div class="card-body">
           <h5 class="card-title">Find influencers</h5>
-          <p class="card-text">Using this operation you can find all the influencers and send them ad requests for campaigns.</p><br>
-          <a href="/sponsor/find_influencers" class="btn btn-primary">Find Influencers</a><br><br>
+          <p class="card-text">Using this operation you can find all the influencers and send them ad requests for campaigns.</p><br><br>
+          <a href="/sponsor/find_influencers" class="btn btn-primary">Find Influencers</a><br>
         </div>
       </div>
 
@@ -58,13 +58,20 @@
         <img src="{{url_for('static',filename='img/person-arms-up.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
         <div class="card-body">
           <h5 class="card-title">Messages</h5>
-          <p class="card-text">Using this operation you can send messages and check recieved messages.</p><br>
+          <p class="card-text">Using this operation you can send messages and check recieved messages You can also see the previous messages.
+          </p><br>
           <button  class="btn btn-primary" type="button" onclick="messages()">Check</button>
           <button  class="btn btn-primary" type="button" onclick="send_messages()">Send</button>
         </div>
       </div>
 
 
-
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/clipboard2-data.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Statistics</h5>
+          <p class="card-text">Using this operation you can check the current statistics of ad requests, users and campaigns.</p><br><br>
+          <a  class="btn btn-primary" type="button" href="/sponsor/stats">Stats</a>
+      </div>
 
 {% endblock %}

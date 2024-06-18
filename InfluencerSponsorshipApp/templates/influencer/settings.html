@@ -1,0 +1,178 @@
+{% extends "influencer/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/influencer/settings.css')}}">
+    <style>
+      .forms{
+        display: flex;
+        justify-content: space-between;
+        max-width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .data{
+        padding: 10px;
+
+      }
+    </style>
+{% endblock %}
+
+{% block js %}  
+  <script>
+    var answer = "{{userDetails[4]}}";
+    document.addEventListener("DOMContentLoaded",function(){
+
+      var category = document.getElementById("category");
+      var niche = document.getElementById("niche");
+
+    // Define options for the dependent select based on the value of the main select
+    var optionsMap = {
+        "Arts and Entertainment": ["Storytelling", "Singer", "Dancer","Actor","Photographer","Video Editor"],
+        "Business": ["Business", "Management", "Consultant"],
+        "Designer": ["Graphic Designer", "Interior Designer", "Game Designer"],
+        "Education": ["Commerce", "Science","Arts"],
+        "Fashion and Beauty": ["Fashion Influencers", "Personal Stylists", "Hair Stylists"],
+        "Finance": ["CA", "Consultant", "Tax Management"],
+        "Health and Wellness": ["Aerobics", "Gym", "Meditation","Yoga"],
+        "Technology": ["Tech Expert"],
+        "Travel": ["Vlogger", "Blogger"],
+        "Public Figure":["Public Figure","Politician"]
+    };
+
+    // Function to update the options of the dependent select
+    
+    var selectedValue = category.value;
+        var options = optionsMap[selectedValue];
+        // Clear existing options
+        niche.innerHTML = "";
+
+        var optionElement = document.createElement("option");
+        optionElement.textContent = answer;
+        niche.appendChild(optionElement);
+
+        // Add new options
+        if (options) {
+            options.forEach(function(option) {
+                var optionElement = document.createElement("option");
+                optionElement.textContent = option;
+                niche.appendChild(optionElement);
+            });
+        }
+    
+    });
+  </script>
+    <script src="{{url_for('static',filename='js/influencer/settings.js')}}"></script>
+    
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div>
+
+
+    <div class="form-area">
+    
+        <div class="form">
+
+            <h1>
+                Edit details
+            </h1>
+            <br>
+            <form class="forms" onsubmit="return edit();" method="post">
+
+                <div class="data">
+                  <label for="name">Name</label>
+                  <input type="text" class="form-control" name="name" id="name" placeholder="name" value="{{userDetails[0]}}" required>
+                  <br>
+                  
+                  <label for="username">Username</label>
+                  <input type="text" class="form-control" name="username" id="username" placeholder="username" value="{{userDetails[1]}}" required>
+                  <br>
+  
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" name="email" id="email" placeholder="xyz@gmail.com" value="{{userDetails[2]}}"  required>
+                  <br>
+
+                  <label for="followers">Followers</label>
+                <input type="text" class="form-control" name="followers" id="followers" placeholder="No. of followers on instagram" value="{{userDetails[6]}}"  required>
+                  
+                </div>
+
+                <div class="data">
+                  <label for="category">Category</label>
+                <div class="input-group mb-3">
+                  
+                  <select class="form-select" id="category" name="category">
+                    <option selected value="{{userDetails[3]}}">{{userDetails[3]}}</option>
+                    
+                      {% for i in category %}
+                          <option value="{{i}}">{{i}}</option>
+                      {% endfor %}
+
+                  </select>
+                </div>
+                
+
+                <label for="niche">Niche</label>
+                <div class="input-group mb-3">
+                  
+                  <select class="form-select" id="niche" name="niche">
+                    <option selected value="{{userDetails[4]}}">{{userDetails[4]}}</option>
+                    
+                  </select>
+                </div>
+                <br>
+
+                        <label for="instaid">Instagram id</label>
+                        <div class="input-group flex-nowrap">
+                            <span class="input-group-text" id="addon-wrapping">@</span>
+                            <input type="text" name="insta_id"  class="form-control" id="instaid" placeholder="instagram id eg. _insta_id_" value="{{userDetails[5]}}" required>
+                        </div>
+                        <br><br>
+
+                        <button type="submit" class="btn btn-primary" onclick="edit()">Edit</button>
+              
+                </div>
+                <br>
+                
+
+                
+
+
+            </form>
+        </div>
+
+    </div>
+
+    <br>
+    <br>
+    <center>
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Delete account?
+  </button>
+  
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to delete your account?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    </center>
+</div>
+
+{% endblock %}

@@ -5,6 +5,7 @@ from flask import url_for
 
 from application.models.user import *
 from application.models.messages import *
+from application.models.campaign import *
 
 
 login_manager = LoginManager()

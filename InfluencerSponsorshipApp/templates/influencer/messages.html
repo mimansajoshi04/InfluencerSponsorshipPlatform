@@ -1,13 +1,13 @@
-{% extends "admin/base.html" %}
+{% extends "influencer/base.html" %}
 
-{% block title %}Admin Messages {% endblock %}
+{% block title %}Messages{% endblock %}
 
 {% block css %}
-    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/message.css')}}">
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/influencer/message.css')}}">
 {% endblock %}
 
 {% block js %}  
-    <script src="{{url_for('static',filename='js/admin/message.js')}}"></script>
+    <script src="{{url_for('static',filename='js/influencer/message.js')}}"></script>
 {% endblock %}
 
 {%block user %}{{username}}{% endblock %}
@@ -113,9 +113,5 @@
         
       </div>
 </div>
-
-
-
-
 
 {% endblock %}

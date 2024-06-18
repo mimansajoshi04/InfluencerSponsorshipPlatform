@@ -1,0 +1,79 @@
+{% extends "influencer/base.html" %}
+
+{% block title %}Dashboard {% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/influencer/dashboard.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script >
+      function send_messages(){
+        window.location.href = "/influencer/send_message";
+      }
+    </script>
+{% endblock %}
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+
+
+<div class="operations">
+
+      <div class="card">
+
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/file-earmark.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Campaigns</h5>
+          <p class="card-text">Using this operation you can see all the campaigns currently going on and the completed campaigns.</p><br>
+          <a href="/influencer/campaigns" class="btn btn-primary">Check Campaigns</a><br>
+        </div>
+      </div>
+
+      <div class="card">
+
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/currency-rupee.svg')}}" class="card-img-top" alt="..." width="10%" height="10%">
+        <div class="card-body">
+          <h5 class="card-title">Ad Requests</h5>
+          <p class="card-text">Using this operation you can see all the advertisment requests from the sponsors and their status.</p><br>
+          <a href="/influencer/adRequests" class="btn btn-primary">Check Ad Requests</a><br>
+        </div>
+      </div>
+
+      <div class="card">
+
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/person-arms-up.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Messages</h5>
+          <p class="card-text">Using this operation you can send messages and check recieved messages.</p><br><br>
+          <button  class="btn btn-primary" type="button" onclick="see_messages()">Check </button>
+          <button  class="btn btn-primary" type="button" onclick="send_messages()">Send </button><br>
+        </div>
+      </div>
+
+      <div class="card">
+
+      </div>
+
+      <div class="card" style="width: 18rem; padding: 20px;">
+        <img src="{{url_for('static',filename='img/clipboard2-data.svg')}}" class="card-img-top" alt="..." width="20%" height="20%">
+        <div class="card-body">
+          <h5 class="card-title">Statistics</h5>
+          <p class="card-text">Using this operation you can check the current statistics of ad requests, users and campaigns.</p><br><br>
+          <a  href="/influencer/stats" class="btn btn-primary" type="button" >Stats</a><br>
+        </div>
+      </div>
+
+
+{% endblock %}

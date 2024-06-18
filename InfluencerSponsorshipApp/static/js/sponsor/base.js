@@ -7,16 +7,21 @@ function getToDashboard(){
 }
 
 function adRequests(){
-
+    window.location.href  = '/sponsor/my_adRequests';
 }
 
 function campaigns(){
-
+    window.location.href  = '/sponsor/my_campaigns';
 }
 
 function messages(){
     window.location.href = "/sponsor/messages";
 }
+
+function stats(){
+    window.location.href = "/sponsor/stats";
+}
+
 
 function settings(){
     window.location.href = "/sponsor/settings";

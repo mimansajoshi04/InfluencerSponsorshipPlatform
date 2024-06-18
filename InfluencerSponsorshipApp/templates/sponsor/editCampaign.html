@@ -36,13 +36,58 @@ body{
 {% endblock %}
 
 {% block js %}  
-    <script src="{{url_for('static',filename='js/sponsor/addCampaign.js')}}"></script>
+    <script>
+
+function edit(){
+    start = document.getElementById("start_date").value;
+    end = document.getElementById("end_date").value;
+
+    d1 = new Date(start);
+    d2 = new Date(end);
+
+    if(isNaN(d1)){
+      alert("Invalid start date");
+      return false;
+    }
+    if(isNaN(d2)){
+      alert("Invalid end date");
+      return false;
+    }
+
+    diff = d2.getTime()-d1.getTime();
+    if(diff<=0){
+      alert("End date should be after start date");
+      return false;
+    }
+
+    category = document.getElementById("category");
+    if(category.value=="Choose..."){
+      alert("Please choose the category.")
+      return false;
+    }
+
+    visibility = document.getElementById("visibility");
+    if(visibility.value=="Choose..."){
+      alert("Please choose the visibility.")
+      return false;
+    }
+
+    industry = document.getElementById("industry");
+    if(industry.value=="Choose..."){
+      alert("Please choose the industry.")
+      return false;
+    }
+
+    return true;
+}
+    </script>
 {% endblock %}
 
 
 {%block user %}{{username}}{% endblock %}
 
 {% block content %}
+
 
 <div>
 
@@ -52,7 +97,7 @@ body{
         <div class="form">
 
             <h1>
-                Add Campaign
+                Edit Details
             </h1>
             <br>
             <form  method="post" id="edit" onsubmit="return edit()">
@@ -60,23 +105,23 @@ body{
                 <div class="items">
                   <div class="data">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="name" required>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="name" value="{{userDetails[1]}}" required>
                     <br>
                     
                     <label for="description">Description</label>
-                    <textarea type="text" class="form-control" name="description" id="description" placeholder="description" required></textarea>
+                    <input type="text" class="form-control" name="description" id="description" placeholder="description" value="{{userDetails[2]}}" required>
                     <br>
     
                     <label for="budget">Budget</label>
-                    <input type="number" class="form-control" name="budget" id="budget" placeholder="Amount in dollars" required>
+                    <input type="number" class="form-control" name="budget" id="budget" placeholder="Amount in dollars" value="{{userDetails[13]}}" required>
                     <br>
     
                     <label for="start_date">Start date</label>
-                    <input type="date" class="form-control" name="start_date" id="start_date"  required>
+                    <input type="text" class="form-control" name="start_date" id="start_date" value="{{userDetails[3][0:10]}}" required>
                     <br>
     
                     <label for="end_date">End date</label>
-                    <input type="date" class="form-control" name="end_date" id="end_date"  required>
+                    <input type="text" class="form-control" name="end_date" id="end_date" value="{{userDetails[4][0:10]}}" required>
                   </div>
 
                   <div class="data">
@@ -84,33 +129,33 @@ body{
                     <div class="input-group mb-3">
 
                         <select class="form-select" id="visibility" name="visibility">
-                          <option selected value="Choose...">Choose...</option>
-                          <option value="private">Private</option>
-                          <option value="public">Public</option>
+                          <option selected value="{{userDetails[11]}}">{{userDetails[11]}}</option>
+                          <option value="private">private</option>
+                          <option value="public">public</option>
       
                         </select>
                       </div>
-               
 
                 <label for="goals">Goals</label>
-                <textarea type="text" class="form-control" name="goals" id="goals" placeholder="goals" required></textarea>
+                <input type="text" class="form-control" name="goals" id="goals" placeholder="goals" value="{{userDetails[9]}}" required>
                 <br>
 
                 <label  for="industry">Industry</label>
                 <div class="input-group mb-3">
                   <select class="form-select" id="industry" name="industry">
-                    <option selected>Choose...</option>
+                    <option selected value="{{userDetails[7]}}">{{userDetails[7]}}</option>
                       {% for i in industry %}
                           <option value="{{i}}">{{i}}</option>
                       {% endfor %}
 
                   </select>
                 </div>
+                
 
                 <label for="category">Category</label>
                 <div class="input-group mb-3">
                   <select class="form-select" id="category" name="category">
-                    <option selected>Choose...</option>
+                    <option selected value="{{userDetails[6]}}">{{userDetails[6]}}</option>
                     
                       {% for i in category %}
                           <option value="{{i}}">{{i}}</option>
@@ -119,19 +164,15 @@ body{
                   </select>
                 </div>
                 
-                <label  for="niche">Niche</label>
-                  <div class="form-control" id="niche">
-
-                  </div>
+                <label  for="niche">Niche</label><br>
+                <input type="text" class="form-control" id="niche" name="niche" value="{{userDetails[5]}}" required>
 
 
                   </div>
-                <br>
+
                 </div>
-
-                  <input type="text" name="join" id="join" style="visibility: hidden;" required>
-                
-                <button type="submit" class="btn btn-primary" onclick="edit()">Add Campaign</button>
+                <br>
+                <button type="submit" class="btn btn-primary" onclick="edit()">Edit Campaign</button>
 
             </form>
         </div>

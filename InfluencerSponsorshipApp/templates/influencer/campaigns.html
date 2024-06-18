@@ -1,20 +1,23 @@
-{% extends "sponsor/base.html" %}
+{% extends "influencer/base.html" %}
 
-{% block title %}My Campaigns{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/userManagement.css')}}">
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/userManagement.css')}}">
 {% endblock %}
 
 {% block js %}  
-    <script src="{{url_for('static',filename='js/sponsor/myCampaign.js')}}"></script>
+    <script src="{{url_for('static',filename = 'js/influencer/campaigns.js')}}"></script>
+    <script >
+      function send_messages(){
+        window.location.href = "/admin/send_message";
+      }
+    </script>
 {% endblock %}
-
 
 {%block user %}{{username}}{% endblock %}
 
 {% block content %}
-
 <div class="searchby">
     <form class="d-flex" role="search" id="formSearchBy" method="post" onsubmit="return true">
         
@@ -25,7 +28,7 @@
                   <option selected value="Choose...">Choose...</option>
                   <option value="category">Category</option>
                   <option value="isflagged">Flagged</option>
-                  <option value="visibility">Visibility</option>
+                  <option value="industry">Industry</option>
                   <option value="status">Status</option>
                   
                 </select>
@@ -72,8 +75,6 @@
 
         <button class="btn btn-warning" type="button" onclick="reload()">See all campaigns</button>
 
-        <button class="btn btn-warning" type="button" onclick="addCampaign()">New Campaign</button>
-
 </div>
 
 <br>
@@ -106,6 +107,7 @@
                             {% endif %}
                             </div>
                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><small>Sponsor: {{campaigns[j][10]}}</small></li>
                                 <li class="list-group-item">Goals: {{campaigns[j][9]}}</li>
                               <li class="list-group-item">Start date: {{campaigns[j][3][0:10]}}</li>
                               <li class="list-group-item">End date: {{campaigns[j][4][0:10]}}</li>
@@ -118,10 +120,8 @@
                             
                             <div class="card-body">
                               <button type="button" class="btn btn-info" id="{{campaigns[j][0]}}" onclick="ad_requests()">Ad Requests</button>
-                              <button type="button" class="btn btn-secondary" id="{{campaigns[j][0]}}" onclick="edit_campaign()">Edit Details</button>
-                              <br><br>
-                              <button type="button" class="btn btn-danger" id="{{campaigns[j][0]}}"  onclick="delete_campaign()">Delete Campaign</button>
-  
+                              <a type="button" class="btn btn-dark" href="influencer/apply/{{campaigns[j][0]}}">Apply</a>
+                              
                             </div>  
                             
                             

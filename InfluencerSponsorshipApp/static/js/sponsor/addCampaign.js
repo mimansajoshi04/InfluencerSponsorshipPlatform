@@ -15,15 +15,42 @@ function edit(){
       return false;
     }
 
-    diff = d2.getTime()-d1.getDate();
-    if(diff<0){
+    diff = d2.getTime()-d1.getTime();
+    if(diff<=0){
       alert("End date should be after start date");
       return false;
     }
-  }
-  document.addEventListener("DOMContentLoaded", function() {
-  var category = document.getElementById("category");
-  var niche = document.getElementById("niche");
+
+    category = document.getElementById("category");
+    if(category.value=="Choose..."){
+      alert("Please choose the category.")
+      return false;
+    }
+
+    visibility = document.getElementById("visibility");
+    if(visibility.value=="Choose..."){
+      alert("Please choose the visibility.")
+      return false;
+    }
+
+    industry = document.getElementById("industry");
+    if(industry.value=="Choose..."){
+      alert("Please choose the industry.")
+      return false;
+    }
+
+    if(niche_list.length==0){
+      alert("Please select the niche.");
+      return false;
+    }
+
+    document.getElementById("join").value = niche_list.join(",");
+    return true;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+var category = document.getElementById("category");
+var niche = document.getElementById("niche");
 
 // Define options for the dependent select based on the value of the main select
 var optionsMap = {
@@ -44,8 +71,10 @@ function updateDependentSelect() {
     var selectedValue = category.value;
     var options = optionsMap[selectedValue];
 
+
     // Clear existing options
     niche.innerHTML = '';
+    niche_list=[];
 
     // Add new options
     if (options) {

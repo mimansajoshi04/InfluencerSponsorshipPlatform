@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends 'influencer/base.html' %}
 
 {% block title %}Messages{% endblock %}
 
@@ -31,12 +31,16 @@
                 <div class="form">
     
                     <h1>
-                        Send message
+                        Send Message
                     </h1>
                     <br>
                     <form onsubmit="return finish();" method="post">
 
                           <br>
+                          
+                        <label for="username">Send to </label>
+                        <input type="text" class="form-control" name="username" id="username" placeholder="Sent to: do not put @"  required>
+                        <br><br>
                         
                         <label for="title">Title </label>
                         <input type="text" class="form-control" name="title" id="title" placeholder="Title"  required>

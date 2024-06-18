@@ -136,7 +136,138 @@ def flagUser(username):
         users = result.fetchall()
         return redirect(url_for("userManagement"))
     
+@app.route("/admin/campaigns",methods=["GET","POST"])
+@login_required
+def seeCampaigns():
 
+    with db.engine.begin() as connection:
+
+        query = text("SELECT newMessages FROM user WHERE username = :user")
+        details = {"user":session["username"]}
+        results = connection.execute(query,details)
+        row = results.fetchone()
+
+        query = text("SELECT * FROM campaign ORDER BY name")
+        results = connection.execute(query)
+        all = results.fetchall()
+
+
+    if request.method =="POST":
+        
+        try:
+            name = request.form["name"]
+
+            try:
+                with db.engine.begin() as connection:
+                    query = text("SELECT * FROM campaign WHERE (name = :name OR name LIKE :show) ORDER BY name")
+                    result = connection.execute(query,{"name":name, "show": f"%{name}%"})
+                    rows = result.fetchall()
+                    if rows is None:
+                        flash("No campaign found. Please check again.")
+                        return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                    return render_template("admin/campaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+            except Exception as e:
+                flash(f"Error occurred: {e}")
+                return render_template("admin/campigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+        
+        except KeyError:
+            try:
+                niche = request.form["n"]
+                try:
+                    with db.engine.begin() as connection:
+                        query = text("SELECT * FROM campaign WHERE (niche = :n OR niche LIKE :show) ORDER BY name")
+                        result = connection.execute(query,{"n":niche, "show": f"%{niche}%"})
+                        rows = result.fetchall()
+                        if rows is None:
+                            flash("No campaign found. Please check again.")
+                            return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                        return render_template("admin/campaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+                except Exception as e:
+                    flash(f"Error occurred: {e}")
+                    return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                
+            except KeyError:
+                filterbychoice = request.form["filterbychoice"]
+                filterbyvalue = request.form["filterbyvalue"] 
+
+                try:
+                    if filterbychoice =="visibility":
+                        if filterbyvalue == "public":
+                            filterbyvalue = "public"
+                        else:
+                            filterbyvalue = "private"
+                        with db.engine.begin() as connection:
+                            query = text("SELECT * FROM campaign WHERE visibility = :filterbyvalue ORDER BY name")
+                            details = {"filterbyvalue" :filterbyvalue}
+                            result = connection.execute(query,details)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No campaign found. Please check again.")
+                                return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("admin/campaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+                        
+                    elif filterbychoice =="isflagged":
+                        if filterbyvalue == "not flagged":
+                            filterbyvalue = 0
+                        else:
+                            filterbyvalue = 1
+                        with db.engine.begin() as connection:
+                            query = text("SELECT * FROM campaign WHERE isflagged = :filterbyvalue ORDER BY name")
+                            details = {"filterbyvalue" :filterbyvalue}
+                            result = connection.execute(query,details)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No campaign found. Please check again.")
+                                return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("admin/campaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+                        
+                    elif filterbychoice =="status":
+                        date=datetime.now()
+                        if filterbyvalue == "on going":
+                            query = text(f"SELECT * FROM campaign WHERE end_date > '{date}' AND start_date < '{date}'  ORDER BY name")
+                        
+                        elif filterbyvalue == "scheduled":
+                            query = text(f"SELECT * FROM campaign WHERE start_date > '{date}' ORDER BY name")
+                        
+                        else:
+                            query = text(f"SELECT * FROM campaign WHERE end_date < '{date}' ORDER BY name")
+                        with db.engine.begin() as connection:
+                            
+                            result = connection.execute(query)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No campaign found. Please check again.")
+                                return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("admin/campaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+
+
+                    else:
+                        with db.engine.begin() as connection:
+                            query = text("SELECT * FROM campaign WHERE category = :filterbyvalue ORDER BY name")
+                            details = {"filterbyvalue" :filterbyvalue}
+                            result = connection.execute(query,details)
+                            rows = result.fetchall()
+                    
+                            if rows is None:
+                                flash("No user found. Please check again.")
+                                return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+                        
+                            return render_template("admin/campaigns.html",campaigns=rows,username=session["username"],new=row[0],method="GET")
+
+                except Exception as e:
+                    flash(f"Error occurred: {e}")
+                    return render_template("admin/campaigns.html",campaigns=all,username=session["username"],new=row[0],method="GET")
+
+
+
+
+    return render_template("admin/campaigns.html",username=session["username"],new=row[0],campaigns = all)
 
 
 @app.route("/admin/unflag_user/<username>")
@@ -334,6 +465,7 @@ def see_user_details(username):
         results = connection.execute(query,details)
 
         row = results.fetchone()
+        
         
         if row[0] == "admin":
 
@@ -551,6 +683,7 @@ def sendAMessage():
 @app.route("/admin/reply/<int:id>/<reciever>",methods=["GET","POST"])
 @login_required
 def adminreply(id,reciever):
+
     
     if request.method=="POST":
         title = request.form["title"]
@@ -574,3 +707,25 @@ def adminreply(id,reciever):
         return redirect(url_for("adminMessages"))
     else:
         return render_template("admin/replyMessage.html",username=session["username"])
+    
+
+#hi
+
+
+@app.route("/admin/flag_campaign/<int:id>",methods=["GET"])
+@login_required
+def flagCampaign(id):
+    query = text("UPDATE campaign SET isflagged = 1 WHERE id = :id")
+    details = {"id":id}
+    with db.engine.begin() as conn:
+        conn.execute(query,details)
+        return redirect(url_for("seeCampaigns"))
+    
+@app.route("/admin/unflag_campaign/<int:id>",methods=["GET"])
+@login_required
+def unflagCampaign(id):
+    query = text("UPDATE campaign SET isflagged = 0,reports=0 WHERE id = :id")
+    details = {"id":id}
+    with db.engine.begin() as conn:
+        conn.execute(query,details)
+        return redirect(url_for("seeCampaigns"))
