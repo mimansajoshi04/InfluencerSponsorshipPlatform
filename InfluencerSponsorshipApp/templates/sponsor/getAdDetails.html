@@ -1,0 +1,82 @@
+{% extends "sponsor/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href = "{{url_for('static',filename = 'css/sponsor/settings.css')}}">
+{% endblock %}
+
+{% block js %}  
+   <script>
+    function send(){
+        name = document.getElementById("name").value;
+        description = document.getElementById("description").value;
+        amount = document.getElementById("amount").value;
+
+        if(name === ""){
+            alert("Give name for the ad request.");
+            return false;
+        }
+
+        if(description === ""){
+            alert("Give description for the ad request.");
+            return false;
+        }
+
+        if(amount<=0){
+            alert("Invalid payment amount");
+            return false;
+        }
+        return true;
+    }
+   </script>
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div>
+
+
+    <div class="form-area">
+    
+        <div class="form">
+
+            <h1>
+                Ad details
+            </h1>
+            <br>
+            <form  method="post" id="edit" onsubmit="return send();">
+
+                  <br>
+                <label for="name">Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="name" required>
+                <br><br>
+                
+                <label for="description">Description</label>
+                <input type="text" class="form-control" name="description" id="description" placeholder="description"  required>
+                <br><br>
+
+            
+                <label for="amount">Payment Amount</label>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">$</span>
+                    <input type="number" name="amount" id="amount"  class="form-control" style="color: blue;" placeholder="Amount (to the nearest dollar)">
+                    <span class="input-group-text">.00</span>
+                  </div>
+
+              
+                </div>
+                <br>
+
+                <button type="submit" class="btn btn-primary" onclick="send()">Send request</button>
+
+
+            </form>
+      </div>
+
+</div>
+
+{% endblock %}

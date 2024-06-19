@@ -25,3 +25,22 @@ class Message(db.Model):
         self.read = False
         self.type=type
         self.message_id = message_id
+
+
+
+class Report(db.Model):
+    __tablename__ = 'report'
+
+    id = db.Column(db.Integer, primary_key = True)
+    complain = db.Column(db.String(100),nullable=False)
+    reported_by = db.Column(db.String(20),nullable=False)
+    report_against = db.Column(db.String(20),nullable=False)
+    sent_date = db.Column(db.DateTime,nullable=False)
+    report_type = db.Column(db.String(20),nullable=False)
+
+    def __init__(self,complain,reported_by,report_against,sent_date,report_type):
+        self.reported_by = reported_by
+        self.report_against = report_against
+        self.complain = complain
+        self.sent_date = sent_date
+        self.report_type = report_type

@@ -6,6 +6,9 @@ from werkzeug.security import check_password_hash
 from flask_login import login_user,logout_user,login_required,LoginManager,current_user
 
 from application.models.user import *
+from application.models.messages import *
+from application.controllers.auth import *
+from application.models.messages import *
 
 @app.route("/dashboard")
 def dashboard():
@@ -184,6 +187,7 @@ def register():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     with db.engine.begin() as connection:
         query = text("UPDATE user SET isActive = 0 WHERE username = :username")

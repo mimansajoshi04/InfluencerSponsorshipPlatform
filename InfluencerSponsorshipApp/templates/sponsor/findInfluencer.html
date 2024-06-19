@@ -1,0 +1,180 @@
+{% extends "sponsor/base.html" %}
+
+{% block title %}My Ad Requests{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/userManagement.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script>
+        function sendRequest(){
+            document.addEventListener("click",function(event){
+                btn = event.target.id;
+                window.location.href = "/sponsor/sendAdRequest/" + btn + '/' + '-1';
+            });
+        }
+
+        function reportDetails(str){
+            document.getElementById("complain_user").value = str;
+        }
+
+        function report(){
+            window.location.href = "/user/report";
+        }
+
+        function reload(){
+            window.location.reload();
+        }
+    </script>
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div class="searchby">
+    <form class="d-fle" role="search" id="formSearchBy" method="post" onsubmit="return true">
+        
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="filterbychoice">Filter By</label>
+                <select class="form-control" id="filterbychoice" name="filterbychoice">
+                  <option selected value="Choose...">Choose...</option>
+                  <option value="category">Category</option>
+                  <option value="isflagged">Flagged</option>
+                  <option value="visibility">Visibility</option>
+                  <option value="status">Status</option>
+                  
+                </select>
+
+                <select class="form-control" id="filterbyvalue" name="filterbyvalue">
+                    <option selected value="Choose...">Choose...</option>
+
+                </select>
+            
+
+
+            <label class="input-group-text" for="filterbyvalue"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+        
+    </form>
+
+    
+    <form class="d-fle" role="search" id="formUsername" method="post" onsubmit="return true">
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="name">Filter By</label>
+            <input type="text" id="name" name = "name" class="form-control" placeholder="name">
+
+            <label class="input-group-text" for="name"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+    </form>
+
+    <form class="d-fle" role="search" id="formNiche" method="post" onsubmit="return true">
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="n">Filter By</label>
+            <input type="text" id="n" name = "n" class="form-control" placeholder="niche">
+
+            <label class="input-group-text" for="name"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+    </form>
+
+</div>
+<br>
+<div style="max-width: fit-content;margin-left: auto;margin-right: auto;">
+
+        <button class="btn btn-warning" type="button" onclick="reload()">See all influencers</button>
+
+</div>
+
+<br>
+<div>
+
+    <div class="allUsers">
+        <br>
+
+        {% for i in range(0, influencers|length ,3) %}
+            
+            <div class="rows">
+                {% for j in range(i,i+3) %}
+                    {% if (influencers|length > j)  %}
+                    <div class="users">
+                        <div class="card" style="width: 18rem;">
+
+                            <div class="card-body">
+                              <h5 class="card-title"><b>username: {{influencers[j][2]}}</b></h5>
+                              <p class="card-text">name: {{influencers[j][1]}}</p>
+                              {% if influencers[j][8] == 1 %}
+                                <span class="badge text-bg-danger">Flagged</span>
+                            {% endif %}
+                            </div>
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item">Email: {{influencers[j][3]}}</li>
+                              <li class="list-group-item">Category: {{influencers[j][4]}}</li>
+                              <li class="list-group-item">Niche: {{influencers[j][5]}}</li>
+                              {% if influencers[j][7]=="-" %}
+                                    <li class="list-group-item">Instagram id not provided.</li>
+                                {% else %}
+                                    <li class="list-group-item"><a href="www.instagram.com/{{influencers[j][7]}}">Visit Instagram</a></li>
+                                {% endif %}
+
+                                <li class="list-group-item">Followers: {{influencers[j][6]}}</li>
+                            </ul>
+                        
+
+                            <div class="card-body">
+                              <button type="button" class="btn btn-info" id="{{influencers[j][0]}}" onclick="sendRequest()"> Send Request</button>
+
+                              
+                            <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-danger" onclick="reportDetails('{{influencers[j][2]}}')">Report User</button>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    {% endif %}
+                {% endfor %}
+                
+                
+            </div>
+            <br><br>
+            
+        {% endfor %}
+
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content" >
+    <div class="modal-header">
+      <h1 class="modal-title fs-5" id="exampleModalLabel">Fill the form to file a complain report</h1>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <form id="send_flag_request" method="post" class="form-control">
+        <label for="complain_user">Against:</label>
+        <input type="text" class="form-control" id="complain_user" name="complain_user" required><br>
+        <label for="complain">Complain:</label>
+        <textarea class="form-control" id="complain" name="complain" placeholder="minimum 10 characters" required></textarea>
+
+        <br>
+
+        <button type="submit" class="btn btn-danger" onclick="report()">Report</button>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+    </div>
+</div>
+
+
+{% endblock %}

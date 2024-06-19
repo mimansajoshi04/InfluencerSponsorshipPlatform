@@ -1,0 +1,138 @@
+{% extends "sponsor/base.html" %}
+
+{% block title %}Ad Requests{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href = "{{url_for('static',filename = 'css/admin/userManagement.css')}}">
+{% endblock %}
+
+{% block js %}  
+    <script></script>
+{% endblock %}
+
+
+{%block user %}{{username}}{% endblock %}
+
+{% block content %}
+
+<div class="searchby">
+    <form class="d-flex" role="search" id="formSearchBy" method="post" onsubmit="return true">
+        
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="filterbychoice">Filter By</label>
+                <select class="form-control" id="filterbychoice" name="filterbychoice">
+                  <option selected value="Choose...">Choose...</option>
+                  <option value="category">Category</option>
+                  <option value="isflagged">Flagged</option>
+                  <option value="visibility">Visibility</option>
+                  <option value="status">Status</option>
+                  
+                </select>
+
+                <select class="form-control" id="filterbyvalue" name="filterbyvalue">
+                    <option selected value="Choose...">Choose...</option>
+
+                </select>
+            
+
+
+            <label class="input-group-text" for="filterbyvalue"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+        
+    </form>
+
+    
+    <form class="d-flex" role="search" id="formUsername" method="post" onsubmit="return true">
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="name">Filter By</label>
+            <input type="text" id="name" name = "name" class="form-control" placeholder="name">
+
+            <label class="input-group-text" for="name"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+    </form>
+
+    <form class="d-flex" role="search" id="formNiche" method="post" onsubmit="return true">
+        <div class="input-group">
+            <span class="input-group-text"></span>
+            <label class="input-group-text" for="n">Filter By</label>
+            <input type="text" id="n" name = "n" class="form-control" placeholder="niche">
+
+            <label class="input-group-text" for="name"><button class="btn btn-success" type="submit">Search</button></label>
+            
+        </div>
+    </form>
+
+</div>
+<br>
+    <div style="max-width: fit-content;margin-left: auto;margin-right: auto;">
+
+        <button class="btn btn-warning" type="button" onclick="reload()">See all campaigns</button>
+
+        <button class="btn btn-warning" type="button" onclick="addCampaign()">New Campaign</button>
+
+</div>
+
+<br>
+<div>
+
+    {{ads}}
+    <div class="allUsers">
+        <br>
+
+        {% for i in range(0, ads|length ,3) %}
+            
+            <div class="rows">
+                {% for j in range(i,i+3) %}
+                    {% if (ads|length > j)  %}
+                    {% set user = ads[i] %}
+                    <div class="users">
+                        <div class="card" style="width: 18rem;">
+
+                            {% if ads[j][11] == "private"%}
+                                <span class="badge text-bg-info">Private</span>
+                            {% else %}
+                            <span class="badge text-bg-primary">Public</span>
+                            {% endif %}
+                            <br>
+
+                            <div class="card-body">
+                              <h5 class="card-title"><b>{{ads[j][1]}}</b></h5>
+                              <p class="card-text">{{ads[j][2]}}</p>
+                              {% if ads[j][8] == 1 %}
+                                <span class="badge text-bg-danger">Flagged</span>
+                            {% endif %}
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Goals: {{ads[j][9]}}</li>
+                            </ul>
+                            
+                            
+                            <div class="card-body">
+                              <button type="button" class="btn btn-danger" id="{{ads[j][0]}}"  onclick="delete_campaign()">Delete AdRequest</button>
+  
+                            </div>  
+                            
+                            
+                        </div>
+                    </div>
+
+                    {% endif %}
+                    
+
+                {% endfor %}
+                <br><br>
+                
+            </div>
+            <br><br>
+            
+        {% endfor %}
+
+    </div>
+</div>
+
+
+{% endblock %}

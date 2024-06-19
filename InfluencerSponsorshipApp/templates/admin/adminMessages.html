@@ -33,6 +33,12 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Sent</button>
           </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="userreport-tab" data-bs-toggle="tab" data-bs-target="#userreport-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">User Reports</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="campaignreport-tab" data-bs-toggle="tab" data-bs-target="#campaignreport-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Campaign Reports</button>
+          </li>
         
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -98,6 +104,35 @@
 
             <div class="tab-pane fade" id="sent-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
                 {% for row in sent %}
+                <div class="container mt-5">
+                    <div class="message-list">
+                        <div class="message-item">
+                            <p>To:<strong>{{row[3]}}</strong></p>
+                            <p><small>{{row[2]}}</small>:  {{row[1]}}</p>
+                            <p><small>Message: {{row[4]}}</small></p>
+                            <p><small>Received: {{row[6]}}</small></p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="userreport-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+                {% for row in userReports %}
+                <div class="container mt-5">
+                    <div class="message-list">
+                        <div class="message-item">
+                            <p>Against: <b>{{row[3]}}</b></p>
+                            <p><small>Reported by</small>:  {{row[2]}}</p>
+                            <p>Complain: {{row[1]}}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="campaignreport-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+                {% for row in campaignReports %}
                 <div class="container mt-5">
                     <div class="message-list">
                         <div class="message-item">

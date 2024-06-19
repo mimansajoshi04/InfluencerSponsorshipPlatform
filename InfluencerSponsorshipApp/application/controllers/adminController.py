@@ -609,6 +609,19 @@ def adminMessages():
 
         sent = results.fetchall()
 
+        query = text(f"SELECT * FROM report WHERE report_type = 'user' ORDER BY id DESC")
+        results = connection.execute(query)
+
+        userReports = results.fetchall()
+
+        
+
+        query = text("SELECT * FROM report WHERE report_type = 'campaign' ORDER BY id DESC")
+        results = connection.execute(query)
+
+        campaignReports = results.fetchall()
+
+
     if unread == []:
         with db.engine.begin() as connection:
             query = text("UPDATE user SET newMessages = 0 WHERE username = :username")
@@ -621,7 +634,7 @@ def adminMessages():
             details = {"username":session["username"]}
             connection.execute(query,details)
     
-    return render_template("admin/adminMessages.html",all=all,read=read,unread=unread,sent = sent,username = session["username"])
+    return render_template("admin/adminMessages.html",all=all,read=read,unread=unread,sent = sent,userReports=userReports,campaignReports=campaignReports,username = session["username"])
 
 @app.route("/admin/mark_as_read/<id>")
 def markAsReadA(id):
