@@ -222,7 +222,6 @@ def sponsorSettings():
                 return render_template("/sponsor/settings.html",username=session["username"],userDetails = userDetails[0],industry=indus,flagged=userDetails[0][5],new=row[0],method="GET")
             
         except KeyError:
-            username = request.form["username"]
             complain = request.form["complain"]
 
             time = datetime.now()
@@ -240,7 +239,7 @@ def sponsorSettings():
             for r in rows:
                 adminUsername = r[0]
 
-                message = Message("User Flagged Request",complain,username,adminUsername,time,"sent",-1)
+                message = Message("User Flagged Request",complain,session["username"],adminUsername,time,"sent",-1)
                 db.session.add(message)
                 db.session.commit()
 
@@ -536,8 +535,7 @@ def sponsorCampaigns():
 
     return render_template("sponsor/myCampaigns.html",username=session["username"],new=row[0],campaigns=campaigns)
 
-@app.route("/delete/<string:string>")
-@login_required
+
 def deleteCampaign(string):
 
     if string =="all":
@@ -545,15 +543,87 @@ def deleteCampaign(string):
 
             query = text("UPDATE ad SET deleted = 1 WHERE sponsor = :username")
             connection.execute(query,{"username":session["username"]})
+
+            query = text("UPDATE campaign SET deleted = 1 WHERE started_by = :username")
+            connection.execute(query,{"username":session["username"]})
             
-            return
+        return
     else:
         with db.engine.begin() as connection:
             query = text("UPDATE ad SET deleted = 1 WHERE campaign_id = :id AND sponsor = :username")
             connection.execute(query,{"username": session["username"],"id":int(string)})
 
+            
+            query = text("UPDATE campaign SET deleted = 1 WHERE started_by = :username AND id = :id")
+            connection.execute(query,{"username": session["username"],"id":int(string)})
+
             return
-        
+
+
+
+@app.route("/sponsor/ad_requests/<int:i>",methods=["GET","POST"])
+def adSpons(i):
+    with db.engine.begin() as connection:
+        query = text("SELECT newMessages FROM user WHERE username = :username")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+        row = results.fetchone()
+
+        query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.campaign_id = {i} ")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+        ads = results.fetchall()
+
+
+    if request.method == "POST":
+        try:
+            start = request.form["start"]
+            end = request.form["end"]
+
+            with db.engine.begin() as connection:
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.payment_amount >{int(start)} AND ad.payment_amount< {int(end)} AND ad.campaign_id = {i} ")
+                details = {"username":session["username"]}
+                results = connection.execute(query,details)
+                a = results.fetchall()
+
+            return render_template("sponsor/adRequests.html",username=session["username"],new=row[0],ads=a,method="GET")
+
+        except:
+
+            filterbychoice = request.form["filterbychoice"]
+            filterbyvalue = request.form["filterbyvalue"]
+
+            if filterbychoice=="category":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.category = '{filterbyvalue}' AND ad.campaign_id = {i} ")
+
+            elif filterbychoice == "visibility":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.visibility = '{filterbyvalue}' AND ad.campaign_id = {i} ")
+
+            elif filterbychoice == "status":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.status = '{filterbyvalue}' AND ad.campaign_id = {i} ")
+            
+            elif filterbychoice == "deleted":
+                if filterbyvalue == "deleted":
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.deleted = 1 AND ad.campaign_id = {i} ")
+                else:
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.deleted = 0 AND ad.campaign_id = {i} ")
+
+
+            else:
+                if filterbyvalue == "flagged":
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.isflagged = 1 AND ad.campaign_id = {i} ")
+                else:
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.isflagged = 0 AND ad.campaign_id = {i} ")
+
+            with db.engine.begin() as connection:
+                result = connection.execute(query)
+                a = result.fetchall()
+
+            return render_template("sponsor/adRequests.html",username=session["username"],new=row[0],ads=a,method="GET")
+
+
+    return render_template("sponsor/adRequests.html",username=session["username"],new=row[0],ads=ads)
+
 
 @app.route("/sponsor/find_influencers",methods=["GET","POST"])
 @login_required
@@ -568,17 +638,24 @@ def find_influencers():
         result = connection.execute(query)
         influencers = result.fetchall()
 
+        query = text("SELECT id FROM user WHERE userType= 'influencer' ")
+        result = connection.execute(query)
+        id = result.fetchone()[0]
+
     if request.method == "POST":
         user = request.form["complain_user"]
         complain = request.form["complain"]
         
         with db.engine.begin() as connection:
 
+            query=text("UPDATE user SET reports = reports + 1 WHERE username= :username")
+            result = connection.execute(query,{"username":user})
+
             query=text("SELECT reports FROM user WHERE username= :username")
             result = connection.execute(query,{"username":user})
             rows = result.fetchone()
 
-            if rows[0]>7:
+            if rows[0]>3:
                 query=text("UPDATE user SET isflagged = 1 WHERE username= :username")
                 connection.execute(query,{"username":user})
 
@@ -586,17 +663,17 @@ def find_influencers():
         db.session.add(new)
         db.session.commit()
 
-        return "completed"
+        return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers,id=id,method="GET")
                 
 
 
-    return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers)
+    return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers,id=id)
 
 
 @app.route("/sponsor/delete_campaign/<int:id>",methods=["GET","POST"])
 @login_required
 def deleteSC(id):
-    redirect(url_for("deleteCampaign",string=id))
+    deleteCampaign(id)
     return redirect(url_for("sponsorCampaigns"))
 
 
@@ -609,7 +686,7 @@ def sendAdRequest(influencer,sponsor):
         results = connection.execute(query,details)
         row = results.fetchone()
 
-        query = text(f"SELECT * FROM campaign WHERE started_by = '{session['username']}'")
+        query = text(f"SELECT * FROM campaign WHERE started_by = '{session['username']}' AND deleted = 0")
         results = connection.execute(query)
 
         campaigns = results.fetchall()
@@ -621,19 +698,19 @@ def sendAdRequest(influencer,sponsor):
 
         else:
 
-            name = request.form["name"]
-            description = request.form["description"]
-            amount = request.form["amount"]
-
-            box = AdRequest(name,description,int(sponsor),int(influencer),session["username"],"pending",amount)
-            db.session.add(box)
-            db.session.commit()
-
-
             with db.engine.begin() as connection:
                 query = text(f"SELECT username FROM user WHERE id = {int(influencer)}")
                 result = connection.execute(query)
                 user = result.fetchone()
+
+
+            name = request.form["name"]
+            description = request.form["description"]
+            amount = request.form["amount"]
+
+            box = AdRequest(name,description,int(sponsor),user[0],session["username"],"pending",amount)
+            db.session.add(box)
+            db.session.commit()
 
 
             mess = Message("New Ad request!","New Ad request in the inbox!",session["username"],user[0],datetime.now(),"ad",-1)
@@ -762,9 +839,6 @@ def sendAdRequest(influencer,sponsor):
                         return render_template("sponsor/myCampaigns.html",campaigns=campaigns,username=session["username"],new=row[0],method="GET")
 
 
-
-
-
 @app.route("/sponsor/my_adRequests",methods=["GET","POST"])
 @login_required
 def sponsorAdRequests():
@@ -781,12 +855,63 @@ def sponsorAdRequests():
         ads = results.fetchall()
 
 
+    if request.method == "POST":
+        try:
+            start = request.form["start"]
+            end = request.form["end"]
 
+            with db.engine.begin() as connection:
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.payment_amount >{int(start)} AND ad.payment_amount< {int(end)} ")
+                details = {"username":session["username"]}
+                results = connection.execute(query,details)
+                a = results.fetchall()
+
+            return render_template("sponsor/adRequests.html",username=session["username"],new=row[0],ads=a,method="GET")
+
+        except:
+
+            filterbychoice = request.form["filterbychoice"]
+            filterbyvalue = request.form["filterbyvalue"]
+
+            if filterbychoice=="category":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.category = '{filterbyvalue}' ")
+
+            elif filterbychoice == "visibility":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.visibility = '{filterbyvalue}' ")
+
+            elif filterbychoice == "status":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.status = '{filterbyvalue}' ")
+            
+            elif filterbychoice == "deleted":
+                if filterbyvalue == "deleted":
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.deleted = 1 ")
+                else:
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND ad.deleted = 0 ")
+
+
+            else:
+                if filterbyvalue == "flagged":
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.isflagged = 1 ")
+                else:
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND campaign.started_by = '{session["username"]}' AND campaign.isflagged = 0 ")
+
+            with db.engine.begin() as connection:
+                result = connection.execute(query)
+                a = result.fetchall()
+
+            return render_template("sponsor/adRequests.html",username=session["username"],new=row[0],ads=a,method="GET")
 
 
     return render_template("sponsor/adRequests.html",username=session["username"],new=row[0],ads=ads)
 
 
+@app.route("/sponsor/delete_ad/<int:id>",methods=["GET"])
+@login_required
+def deleteSponsorAd(id):
+    with db.engine.begin() as connection:
+        query = text(f"UPDATE ad SET deleted = 1 WHERE id = {id}")
+        connection.execute(query)
+    return redirect(url_for("sponsorAdRequests"))
 
 
 @app.route("/sponsor/edit_campaign/<int:id>",methods=["GET","POST"])

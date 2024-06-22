@@ -117,10 +117,14 @@
                             
                             
                             <div class="card-body">
-                              <button type="button" class="btn btn-info" id="{{campaigns[j][0]}}" onclick="ad_requests()">Ad Requests</button>
-                              <button type="button" class="btn btn-secondary" id="{{campaigns[j][0]}}" onclick="edit_campaign()">Edit Details</button>
-                              <br><br>
-                              <button type="button" class="btn btn-danger" id="{{campaigns[j][0]}}"  onclick="delete_campaign()">Delete Campaign</button>
+                                {% if campaigns[j][14] == 0 %}
+                                <button type="button" class="btn btn-info" id="{{campaigns[j][0]}}" onclick="ad_requests()">Ad Requests</button>
+                                <button type="button" class="btn btn-secondary" id="{{campaigns[j][0]}}" onclick="edit_campaign()">Edit Details</button>
+                                <br><br>
+                                <button type="button" class="btn btn-danger" id="{{campaigns[j][0]}}"  onclick="delete_campaign()">Delete Campaign</button>
+                                {% else %}
+                                <p><small>The campaign has been deleted.</small></p>
+                                {% endif %}
   
                             </div>  
                             

@@ -723,6 +723,69 @@ def adminreply(id,reciever):
     
 
 #hi
+@app.route("/admin/adRequests",methods=["GET","POST"])
+def adminAdRequests():
+    with db.engine.begin() as connection:
+        query = text("SELECT newMessages FROM user WHERE username = :username")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+        row = results.fetchone()
+
+        query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+        ads = results.fetchall()
+
+
+    if request.method == "POST":
+        try:
+            start = request.form["start"]
+            end = request.form["end"]
+
+            with db.engine.begin() as connection:
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND ad.payment_amount >{int(start)} AND ad.payment_amount< {int(end)} ")
+                details = {"username":session["username"]}
+                results = connection.execute(query,details)
+                a = results.fetchall()
+
+            return render_template("admin/adRequests.html",username=session["username"],new=row[0],ads=a,method="GET")
+
+        except:
+
+            filterbychoice = request.form["filterbychoice"]
+            filterbyvalue = request.form["filterbyvalue"]
+
+            if filterbychoice=="category":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id  AND campaign.category = '{filterbyvalue}' ")
+
+            elif filterbychoice == "visibility":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id  AND campaign.visibility = '{filterbyvalue}' ")
+
+            elif filterbychoice == "status":
+                query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id AND ad.status = '{filterbyvalue}' ")
+            
+            elif filterbychoice == "deleted":
+                if filterbyvalue == "deleted":
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id  AND ad.deleted = 1 ")
+                else:
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id  AND ad.deleted = 0 ")
+
+
+            else:
+                if filterbyvalue == "flagged":
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id  AND campaign.isflagged = 1 ")
+                else:
+                    query = text(f"SELECT * FROM ad,campaign WHERE ad.campaign_id = campaign.id  AND campaign.isflagged = 0 ")
+
+            with db.engine.begin() as connection:
+                result = connection.execute(query)
+                a = result.fetchall()
+
+            return render_template("admin/adRequests.html",username=session["username"],new=row[0],ads=a,method="GET")
+
+
+    return render_template("admin/adRequests.html",username=session["username"],new=row[0],ads=ads)
+
 
 
 @app.route("/admin/flag_campaign/<int:id>",methods=["GET"])

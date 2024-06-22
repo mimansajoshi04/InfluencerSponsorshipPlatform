@@ -19,10 +19,6 @@
             document.getElementById("complain_user").value = str;
         }
 
-        function report(){
-            window.location.href = "/user/report";
-        }
-
         function reload(){
             window.location.reload();
         }
@@ -129,7 +125,7 @@
                         
 
                             <div class="card-body">
-                              <button type="button" class="btn btn-info" id="{{influencers[j][0]}}" onclick="sendRequest()"> Send Request</button>
+                              <button type="button" class="btn btn-info" id="{{id}}" onclick="sendRequest()"> Send Request</button>
 
                               
                             <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-danger" onclick="reportDetails('{{influencers[j][2]}}')">Report User</button>

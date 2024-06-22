@@ -20,6 +20,7 @@ class Campaign(db.Model):
     visibility = db.Column(db.String(10),nullable=False)
     reports = db.Column(db.Integer)
     budget = db.Column(db.Integer)
+    deleted  = db.Column(db.Boolean,nullable=False)
 
     def __init__(self,name,description,start_date,end_date,started_by,visibility,niche,category,goals,budget,industry):
         self.name = name
@@ -28,6 +29,7 @@ class Campaign(db.Model):
         self.end_date= end_date
         self.description = description
         self.isflagged = False
+        self.deleted = False
         self.visibility=visibility
         self.reports = 0
         self.niche = niche

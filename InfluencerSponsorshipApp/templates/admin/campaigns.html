@@ -119,12 +119,17 @@
                             
                             
                             <div class="card-body">
+                              {% if campaigns[j][14] == 0 %}
                               <button type="button" class="btn btn-info" id="{{campaigns[j][0]}}" onclick="ad_requests()">Ad Requests</button>
 
                               {% if campaigns[j][8]==0 %}
                               <button type="button" class="btn btn-dark" id="{{campaigns[j][0]}}" onclick="flag_campaign()">Flag Campaign</button>
                               {% else %}
                               <button type="button" class="btn btn-warning" id="{{campaigns[j][0]}}"  onclick="unflag_campaign()">Unflag Camapign</button>
+                              {% endif %}
+
+                              {% else %}
+                              <p><small>This campaign has been deleted.</small></p>
                               {% endif %}
                             </div>  
                             

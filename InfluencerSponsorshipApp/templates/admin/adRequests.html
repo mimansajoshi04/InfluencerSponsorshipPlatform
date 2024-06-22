@@ -1,4 +1,4 @@
-{% extends "sponsor/base.html" %}
+{% extends "admin/base.html" %}
 
 {% block title %}Ad Requests{% endblock %}
 
@@ -9,10 +9,10 @@
 {% block js %}  
     <script>
         function reload(){
-            window.location.href = window.location.href;
+            window.location.href = "/admin/adRequests";
         }
     </script>
-    <script src="{{url_for('static',filename='js/sponsor/adRequests.js')}}" ></script>
+    <script src="{{url_for('static',filename='js/admin/adRequests.js')}}" ></script>
 {% endblock %}
 
 
@@ -104,6 +104,7 @@
                             {% endif %}
                             </div>
                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Sponsor: {{ads[j][19]}}</li>
                                 <li class="list-group-item">Sent to:{{ads[j][2]}}</li>
                                 <li class="list-group-item">Payment:$ {{ads[j][8]}}</li>
                                 <li class="list-group-item">Campaign name: {{ads[j][10]}}</li>
@@ -119,14 +120,11 @@
                             
                             
                             <div class="card-body">
-                              {% if ads[j][7] != 1 %}
-                                <button type="button" class="btn btn-danger" onclick="delete_ad('{{ads[j][0]}}')">Delete AdRequest</button>
-                                {% else %}
+                              {% if ads[j][7] != 0 %}
                                 <p><small><b>This ad has been deleted.</b></small></p>
                                 {% endif %}
-
                                 {% if ads[j][23] != 0 %}
-                                <p><small><b>This campaign has been deleted.</b></small></p>
+                                <br><p><small><b>This campaign has been deleted.</b></small></p>
                                 {% endif %}
                             </div>  
                             

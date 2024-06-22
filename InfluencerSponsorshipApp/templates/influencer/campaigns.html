@@ -9,9 +9,16 @@
 {% block js %}  
     <script src="{{url_for('static',filename = 'js/influencer/campaigns.js')}}"></script>
     <script >
-      function send_messages(){
-        window.location.href = "/admin/send_message";
+      function report(){
+        window.location.href = window.location.href;
       }
+
+      function reportC(btn){
+        document.getElementById("complain_user").value = btn;
+      }
+
+      
+
     </script>
 {% endblock %}
 
@@ -119,8 +126,8 @@
                             
                             
                             <div class="card-body">
-                              <button type="button" class="btn btn-info" id="{{campaigns[j][0]}}" onclick="ad_requests()">Ad Requests</button>
-                              <a type="button" class="btn btn-dark" href="influencer/apply/{{campaigns[j][0]}}">Apply</a>
+                              <a type="button" class="btn btn-dark" href="/influencer/apply/{{campaigns[j][0]}}">Apply</a>
+                              <button data-bs-toggle="modal" data-bs-target="#exampleeModal" class="btn btn-danger" onclick="reportC('{{campaigns[j][0]}}')">Report</button>
                               
                             </div>  
                             
@@ -141,6 +148,35 @@
 
     </div>
 </div>
+
+
+<div class="modal fade" id="exampleeModal" tabindex="-1" aria-labelledby="exampleeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content" >
+    <div class="modal-header">
+      <h1 class="modal-title fs-5" id="exampleModalLabel">Fill the form to file a complain report</h1>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <form id="send_complain_request" method="post" class="form-control">
+        <label for="complain_user">Against:</label>
+        <input type="text" class="form-control" id="complain_user" name="complain_user" style="display: none;" required><br>
+        <label for="complainss">Complain:</label>
+        <textarea class="form-control" id="complainss" name="complainss" placeholder="minimum 10 characters" required></textarea>
+
+        <br>
+
+        <button type="submit" class="btn btn-danger" onclick="report()">Report</button>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+    </div>
+</div>
+
+
 
 
 {% endblock %}

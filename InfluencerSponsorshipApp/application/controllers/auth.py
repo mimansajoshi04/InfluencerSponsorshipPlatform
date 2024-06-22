@@ -25,8 +25,6 @@ def dashboard():
     else:
         return redirect(url_for("sponsorDashboard"))
 
-
-
 @app.route('/')
 def index():
     if 'username' in session:
