@@ -15,6 +15,38 @@
 
 {% block js %}  
     <script src="{{url_for('static',filename='js/sponsor/message.js')}}"></script>
+    <script>
+        function negotiate(){
+            amount = document.getElementById("amount").value;
+
+            if(parseInt(amount)<=0){
+                alert("Invalid payment amount!");
+                return false;
+            }
+            return true;
+        }
+
+        function setadid(btn){
+            document.getElementById("ad_id").value = btn;
+        }
+
+        function setaid(btn){
+            document.getElementById("a_id").value = btn;
+        }
+
+        function negotiateN(){
+            amount = document.getElementById("amountN").value;
+            
+            if(parseInt(amount)<=0){
+                alert("Invalid payment amount!");
+                return false;
+            }
+
+            return true;
+        }
+
+
+    </script>
 {% endblock %}
 
 
@@ -39,13 +71,22 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Sent</button>
           </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ad-tab" data-bs-toggle="tab" data-bs-target="#ad-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Ad negotitations</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="appli-tab" data-bs-toggle="tab" data-bs-target="#appli-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Ad applications</button>
+          </li>
         
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+          <br>
+          <div style="width: max-content; margin-left: auto; margin-right: auto;">
+            <a class ="btn btn-secondary" href="/sponsor/markAllRead">Mark all read</a>
+            <a class ="btn btn-secondary" href="/sponsor/markAllUnread">Mark all unread</a>
+          </div>
             {% for row in all %}
-    
-            
                 <div class="container mt-5">
                     <div class="message-list">
                         <div class="message-item">
@@ -56,10 +97,14 @@
                             <p><small>Received: {{row[6]}}</small></p>
                             {% if row[5] == 0  and row[2]!=username %}
                                 <button class="btn btn-warning" id="{{row[0]}}" type="button" onclick="mark_as_read()">Mark as read</button>
+                                {% if row[7] == "sent" or row[7] == "reply" %}
                                 <button class="btn btn-secondary" id="{{row[0]}}/{{row[2]}}" type="button" onclick="reply()">Reply</button>
+                                {% endif %}
                             {% elif row[5]!=0 and row[2]!=username %}    
                                 <button class="btn btn-info" id="{{row[0]}}" type="button" onclick="mark_as_unread()">Mark as unread</button>
+                                {% if row[7] == "sent" or row[7] == "reply" %}
                                 <button class="btn btn-secondary" id="{{row[0]}}/{{row[2]}}" type="button" onclick="reply()">Reply</button>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -69,6 +114,10 @@
 
         
             <div class="tab-pane fade" id="unread-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="1">
+              <br>
+              <div style="width: max-content; margin-left: auto; margin-right: auto;">
+                <a class ="btn btn-secondary" href="/sponsor/markAllRead">Mark all read</a>
+              </div>
                 {% for row in unread %}
                 <div class="container mt-5">
                     <div class="message-list">
@@ -86,6 +135,10 @@
             </div>
 
             <div class="tab-pane fade" id="read-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+              <br>
+              <div style="width: max-content; margin-left: auto; margin-right: auto;">
+                <a class ="btn btn-secondary" href="/sponsor/markAllUnread">Mark all unread</a>
+              </div>
                 {% for row in read %}
                 <div class="container mt-5">
                     <div class="message-list">
@@ -117,9 +170,102 @@
                 {% endfor %}
             </div>
 
+            <div class="sent-pane fade" id="ad-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+                {% for row in ads %}
+                <div class="container mt-5">
+                    <div class="message-list">
+                        <div class="message-item">
+                            <p>To:<strong>{{row[3]}}</strong></p>
+                            <p><small>{{row[2]}}</small>:  {{row[1]}}</p>
+                            <p><small>Message: {{row[4]}}</small></p>
+                            <p><small>Received: {{row[6]}}</small></p>
+                            
+                            {% if row[7] == "negotiate" %}
+                            <a class="btn btn-info" data-bs-toggle="modal" data-bs-target="#Modal" onclick="setadid('{{row[8]}}')">Negotiate</a>
+                            <a class="btn btn-success" href="/sponsor/accept/{{row[8]}}">Accept</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+
+            <div class="sent-pane fade" id="appli-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+                {% for row in appli %}
+                <div class="container mt-5">
+                    <div class="message-list">
+                        <div class="message-item">
+                            <p>To:<strong>{{row[3]}}</strong></p>
+                            <p><small>{{row[2]}}</small>:  {{row[1]}}</p>
+                            <p><small>Message: {{row[4]}}</small></p>
+                            <p>Amount: <b>$ {{row[9]}}</b></p>
+                            <p><small>Received: {{row[6]}}</small></p>
+
+                            <a class="btn btn-danger" href="/sponsor/reject_ad/{{row[8]}}">Reject</a>
+                            <a class="btn btn-info" data-bs-toggle="modal" data-bs-target="#MModal" onclick="setaid('{{row[8]}}')">Negotiate</a>
+                            <a class="btn btn-success" href="/sponsor/accept_ad/{{row[8]}}">Accept</a>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
         
       </div>
 </div>
 
+
+<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" >
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Fill the negotiation amount to send request</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="negotiate" method="post" class="form-control" onsubmit="return negotiate()">
+
+            <label for="amount">Negotiation amount:</label>
+            <input type="number" class="form-control" id="amount" name="amount" placeholder="Amount in nearest dollar($)" required>
+            <input type ="number" style="display: none;" id="ad_id" name="ad_id" required>
+            <br>
+
+            <button type="submit" class="btn btn-success" onclick="negotiate()">Negotiate</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="MModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" >
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Fill the negotiation amount to send request</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="negotiate" method="post" class="form-control" onsubmit="return negotiateN()">
+
+            <label for="amountN">Negotiation amount:</label>
+            <input type="number" class="form-control" id="amountN" name="amountN" placeholder="Amount in nearest dollar($)" required>
+            <input type ="number" style="display: none;" id="a_id" name="a_id" required>
+            <br>
+
+            <button type="submit" class="btn btn-success" onclick="negotiateN()">Negotiate</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}

@@ -43,6 +43,11 @@
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <br>
+          <div style="width: max-content; margin-left: auto; margin-right: auto;">
+            <a class ="btn btn-secondary" href="/admin/markAllRead">Mark all read</a>
+            <a class ="btn btn-secondary" href="/admin/markAllUnread">Mark all unread</a>
+          </div>
         {% for row in all %}
 
         
@@ -69,6 +74,10 @@
 
         
             <div class="tab-pane fade" id="unread-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="1">
+                <br>
+          <div style="width: max-content; margin-left: auto; margin-right: auto;">
+            <a class ="btn btn-secondary" href="/admin/markAllRead">Mark all read</a>
+          </div>
                 {% for row in unread %}
                 <div class="container mt-5">
                     <div class="message-list">
@@ -86,6 +95,10 @@
             </div>
 
             <div class="tab-pane fade" id="read-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
+                <br>
+          <div style="width: max-content; margin-left: auto; margin-right: auto;">
+            <a class ="btn btn-secondary" href="/admin/markAllUnread">Mark all unread</a>
+          </div>
                 {% for row in read %}
                 <div class="container mt-5">
                     <div class="message-list">

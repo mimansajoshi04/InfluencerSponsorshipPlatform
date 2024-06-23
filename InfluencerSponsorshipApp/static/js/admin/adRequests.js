@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         else{
             formSearchBy.submit();
-            window.onload = '/admin/adRequests';
+            window.onload = window.location.href;
         }
     });
 
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         else{
             formUsername.submit();
-            window.onload = '/admin/adRequests';
+            window.onload = window.location.href;
         }
     });
 });

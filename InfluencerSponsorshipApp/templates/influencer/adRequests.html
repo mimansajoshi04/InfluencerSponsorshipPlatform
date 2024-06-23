@@ -1,4 +1,4 @@
-{% extends "sponsor/base.html" %}
+{% extends "influencer/base.html" %}
 
 {% block title %}Ad Requests{% endblock %}
 
@@ -12,7 +12,21 @@
             window.location.href = window.location.href;
         }
     </script>
-    <script src="{{url_for('static',filename='js/sponsor/adRequests.js')}}" ></script>
+    <script src="{{url_for('static',filename='js/admin/adRequests.js')}}" ></script>
+    <script>
+        function negotiate(){
+            amount = document.getElementById("amount").value;
+
+            if(parseInt(amount)<=0){
+                alert("Invalid payment amount!");
+                return false;
+            }
+        }
+
+        function setadid(btn){
+            document.getElementById("ad_id").value = btn;
+        }
+    </script>
 {% endblock %}
 
 
@@ -104,14 +118,15 @@
                             {% endif %}
                             </div>
                             <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Sponsor: {{ads[j][19]}}</li>
                                 <li class="list-group-item">Sent to:{{ads[j][2]}}</li>
-                                <li class="list-group-item">Payment:$ {{ads[j][8]}}</li>
+                                <li class="list-group-item"><b>Payment:$ {{ads[j][8]}}</b></li>
                                 <li class="list-group-item">Campaign name: {{ads[j][10]}}</li>
                                 <li class="list-group-item">Campaign description: {{ads[j][11]}}</li>
                                 <li class="list-group-item">Campaign type: {{ads[j][20]}}</li>
                                 <li class="list-group-item">Campaign goals: {{ads[j][18]}}</li>
-                                <li class="list-group-item">Start date: {{ads[j][12][0:10]}}</li>
-                                <li class="list-group-item">End date: {{ads[j][13][0:10]}}</li>
+                                <li class="list-group-item"><b>Start date: {{ads[j][12][0:10]}}</b></li>
+                                <li class="list-group-item"><b>End date: {{ads[j][13][0:10]}}</b></li>
                                 <li class="list-group-item">Industry: {{ads[j][16]}}</li>
                                 <li class="list-group-item">Category: {{ads[j][15]}}</li>
                                 <li class="list-group-item">Niche: {{ads[j][14]}}</li>
@@ -119,17 +134,17 @@
                             
                             
                             <div class="card-body">
-                              {% if ads[j][7] != 1 %}
-                               {% if ads[j][6] == "pending" %}
-                                <button type="button" class="btn btn-danger" onclick="delete_ad('{{ads[j][0]}}')">Delete AdRequest</button>
-                                {% endif %}
-
-                                {% else %}
+                              {% if ads[j][7] != 0 %}
                                 <p><small><b>This ad has been deleted.</b></small></p>
+                                {% else %}
+                                    {% if ads[j][6] == "pending" %}
+                                        <a class="btn btn-danger" href="/influencer/reject/{{ads[j][0]}}">Reject</a>
+                                        <a class="btn btn-info" data-bs-toggle="modal" data-bs-target="#Modal" onclick="setadid('{{ads[j][0]}}')">Negotiate</a>
+                                        <a class="btn btn-success" href="/influencer/accept/{{ads[j][0]}}">Accept</a>
+                                    {% endif %}
                                 {% endif %}
-
                                 {% if ads[j][23] != 0 %}
-                                <p><small><b>This campaign has been deleted.</b></small></p>
+                                <br><p><small><b>This campaign has been deleted.</b></small></p>
                                 {% endif %}
                             </div>  
                             
@@ -150,6 +165,31 @@
 
     </div>
 </div>
+
+<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" >
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Fill the negotiation amount to send request</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="negotiate" method="post" class="form-control" onsubmit="return negotiate()">
+
+            <label for="amount">Negotiation amount:</label>
+            <input type="number" class="form-control" id="amount" name="amount" placeholder="Amount in nearest dollar($)" required>
+            <input type ="number" style="display: none;" id="ad_id" name="ad_id" required>
+            <br>
+
+            <button type="submit" class="btn btn-success" onclick="negotiate()">Negotiate</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 {% endblock %}

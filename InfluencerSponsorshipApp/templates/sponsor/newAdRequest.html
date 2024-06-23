@@ -17,7 +17,7 @@
         }
 
         function ad_requests(str){
-            window.location.href = window.location.href.slice(21,46 ) + str;
+            window.location.href = window.location.href.slice(0,window.location.href.length-2) + str;
         }
     </script>
 {% endblock %}

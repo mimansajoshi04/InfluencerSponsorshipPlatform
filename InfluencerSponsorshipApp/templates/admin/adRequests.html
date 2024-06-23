@@ -9,7 +9,7 @@
 {% block js %}  
     <script>
         function reload(){
-            window.location.href = "/admin/adRequests";
+            window.location.href = window.location.href;
         }
     </script>
     <script src="{{url_for('static',filename='js/admin/adRequests.js')}}" ></script>

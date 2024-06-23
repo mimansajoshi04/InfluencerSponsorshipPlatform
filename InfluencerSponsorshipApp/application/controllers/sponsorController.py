@@ -285,7 +285,7 @@ def markAsReadS(id):
         details = {"id":id}
         connection.execute(query,details)
 
-    return redirect(url_for("adminMessages"))
+    return redirect(url_for("sponsorMessages"))
 
 @app.route("/sponsor/mark_as_unread/<id>")
 def markAsUnreadS(id):
@@ -294,7 +294,7 @@ def markAsUnreadS(id):
         details = {"id":id}
         connection.execute(query,details)
 
-    return redirect(url_for("adminMessages"))
+    return redirect(url_for("sponsorMessages"))
 
 @app.route("/sponsor/reply/<int:id>/<reciever>",methods=["GET","POST"])
 @login_required
@@ -560,7 +560,6 @@ def deleteCampaign(string):
             return
 
 
-
 @app.route("/sponsor/ad_requests/<int:i>",methods=["GET","POST"])
 def adSpons(i):
     with db.engine.begin() as connection:
@@ -638,10 +637,6 @@ def find_influencers():
         result = connection.execute(query)
         influencers = result.fetchall()
 
-        query = text("SELECT id FROM user WHERE userType= 'influencer' ")
-        result = connection.execute(query)
-        id = result.fetchone()[0]
-
     if request.method == "POST":
         user = request.form["complain_user"]
         complain = request.form["complain"]
@@ -663,11 +658,11 @@ def find_influencers():
         db.session.add(new)
         db.session.commit()
 
-        return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers,id=id,method="GET")
+        return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers,method="GET")
                 
 
 
-    return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers,id=id)
+    return render_template("sponsor/findInfluencer.html",new=row[0],username=session["username"],influencers=influencers)
 
 
 @app.route("/sponsor/delete_campaign/<int:id>",methods=["GET","POST"])
@@ -698,22 +693,16 @@ def sendAdRequest(influencer,sponsor):
 
         else:
 
-            with db.engine.begin() as connection:
-                query = text(f"SELECT username FROM user WHERE id = {int(influencer)}")
-                result = connection.execute(query)
-                user = result.fetchone()
-
-
             name = request.form["name"]
             description = request.form["description"]
             amount = request.form["amount"]
 
-            box = AdRequest(name,description,int(sponsor),user[0],session["username"],"pending",amount)
+            box = AdRequest(name,description,int(sponsor),influencer,session["username"],"pending",amount)
             db.session.add(box)
             db.session.commit()
 
 
-            mess = Message("New Ad request!","New Ad request in the inbox!",session["username"],user[0],datetime.now(),"ad",-1)
+            mess = Message("New Ad request!","New Ad request in the inbox!",session["username"],influencer,datetime.now(),"ad",-1)
             db.session.add(mess)
             db.session.commit()
 
@@ -913,6 +902,29 @@ def deleteSponsorAd(id):
         connection.execute(query)
     return redirect(url_for("sponsorAdRequests"))
 
+@app.route("/sponsor/accept/<int:id>")
+def acceptAdS(id):
+
+    with db.engine.begin() as connection:
+
+        query = text(f"SELECT influencer FROM ad WHERE id = {id}")
+        influencer = connection.execute(query).fetchone()[0]
+
+        query = text(f"SELECT amount FROM negotiate WHERE message_id = {id} AND sent_to=:username ORDER BY id DESC LIMIT 1")
+        amount = connection.execute(query,{"username":session["username"]}).fetchone()[0]
+
+        query = text(f"UPDATE ad SET status = 'accepted',payment_amount= {amount} WHERE id = {id}")   
+        connection.execute(query)
+
+        query = text(f"UPDATE negotiate SET type= 'accepted' WHERE message_id ={id} AND type= 'negotiate' ")
+        connection.execute(query)
+
+    n = Message("Ad request negotiation accepted by sponsorer!",f"Ad request negotiation has been accepted.",session["username"],influencer,datetime.now(),"accepted",id)
+    db.session.add(n)
+    db.session.commit()
+
+    flash("Ad request accepted.")
+    return redirect(url_for("sponsorMessages"))
 
 @app.route("/sponsor/edit_campaign/<int:id>",methods=["GET","POST"])
 @login_required
@@ -962,7 +974,68 @@ def editCampaignDetails(id):
 
     return render_template("/sponsor/editCampaign.html",username=session["username"],new=row[0],userDetails=rows,industry=indus,category=category)
 
-@app.route('/sponsor/messages')
+
+@app.route("/sponsor/accept_ad/<int:id>")
+@login_required
+def acceptAdApp(id):
+    with db.engine.begin() as connection:
+        query = text(f"UPDATE application SET type = 'accepted' WHERE message_id = {id}")
+        connection.execute(query)
+
+        query = text(f"SELECT sent_by,amount FROM application WHERE id = {id}")
+        data = connection.execute(query).fetchone()
+        
+
+    box = AdRequest("Ad application","Ad application was taken.",id,data[0],session["username"],"accepted",data[1])
+    db.session.add(box)
+    db.session.commit()
+
+
+    mess = Message("New Ad request!","New Ad request in the inbox!",session["username"],data[0],datetime.now(),"ad",-1)
+    db.session.add(mess)
+    db.session.commit()
+
+    flash("Ad request accepted!")
+    return redirect(url_for("sponsorMessages"))
+    
+
+@app.route("/sponsor/markAllRead")
+def markAllReadS():
+    with db.engine.begin() as connection:
+        query = text(f"UPDATE message SET read = 1 WHERE sent_to = '{session["username"]}' ")
+        connection.execute(query)
+
+    return redirect(url_for("sponsorMessages"))
+
+
+@app.route("/sponsor/markAllUnread")
+def markAllUnreadS():
+    with db.engine.begin() as connection:
+        query = text(f"UPDATE message SET read = 0 WHERE sent_to = '{session["username"]}' ")
+        connection.execute(query)
+
+    return redirect(url_for("sponsorMessages"))
+
+
+@app.route("/sponsor/reject_ad/<int:id>")
+@login_required
+def rejectAdApp(id):
+    with db.engine.begin() as connection:
+        query = text(f"UPDATE application SET type = 'rejected' WHERE message_id = {id}")
+        connection.execute(query)
+
+        query = text(f"SELECT sent_by FROM application WHERE message_id = {id}")
+        data = connection.execute(query).fetchone()
+
+
+    mess = Message("Ad application rejected!","Your ad request was rejected by the sponsorer!",session["username"],data[0],datetime.now(),"sent",-1)
+    db.session.add(mess)
+    db.session.commit()
+
+    flash("Ad request rejected!")
+    return redirect(url_for("sponsorMessages"))
+
+@app.route('/sponsor/messages',methods=["GET","POST"])
 @login_required
 def sponsorMessages():
 
@@ -991,6 +1064,18 @@ def sponsorMessages():
 
         sent = results.fetchall()
 
+        query = text("SELECT * FROM negotiate WHERE sent_to = :username AND type='negotiate' ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        ads = results.fetchall()
+
+        query = text("SELECT * FROM application WHERE sent_to = :username AND type='application' ORDER BY id DESC")
+        details = {"username":session["username"]}
+        results = connection.execute(query,details)
+
+        appli = results.fetchall()
+
     if unread == []:
         with db.engine.begin() as connection:
             query = text("UPDATE user SET newMessages = 0 WHERE username = :username ")
@@ -1002,5 +1087,38 @@ def sponsorMessages():
             query = text("UPDATE user SET newMessages = 1 WHERE username = :username")
             details = {"username":session["username"]}
             connection.execute(query,details)
+
+
+    if request.method=="POST":
+        try:
+            id = request.form["ad_id"]
+            amount = request.form["amount"]
+
+            with db.engine.begin() as connection:
+                query = text(f"SELECT influencer FROM ad WHERE id = {id}")
+                influencer = connection.execute(query).fetchone()[0]
+                
+
+            n = Negotiate("Negotiation for ad request",f"Negotiation for ad request for an amount of ${amount}",session["username"],influencer,datetime.now(),"negotiate",id,amount)
+            db.session.add(n)
+            db.session.commit()
+
+            flash("Negotiation request sent!")
+            return render_template("sponsor/messages.html",ads=ads,all=all,read=read,unread=unread,username = session["username"],sent=sent,method="GET")
     
-    return render_template("sponsor/messages.html",all=all,read=read,unread=unread,username = session["username"],sent=sent)
+        except:
+            id = request.form["a_id"]
+            amount = request.form["amountN"]
+
+            with db.engine.begin() as connection:
+                query = text(f"SELECT sent_by FROM application WHERE message_id = {id}")
+                influencer = connection.execute(query).fetchone()[0]
+
+            n = Application("Negotiation for ad request",f"Negotiation for ad request for an amount of ${amount}",session["username"],influencer,datetime.now(),"application",id,amount)
+            db.session.add(n)
+            db.session.commit()
+
+            flash("Negotiation request sent!")
+            return render_template("sponsor/messages.html",ads=ads,all=all,read=read,unread=unread,username = session["username"],sent=sent,method="GET")
+            
+    return render_template("sponsor/messages.html",ads=ads,all=all,appli=appli,read=read,unread=unread,username = session["username"],sent=sent)
